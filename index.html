@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cozy AI Game Studio — Phase 1: Isometric Office</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/office.css" />
+</head>
+<body>
+  <div id="app-shell">
+    <!-- Top Compact Studio Bar -->
+    <header class="studio-topbar">
+      <div class="brand-cluster">
+        <div class="brand-emblem" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <polygon points="12,2 22,7.5 12,13 2,7.5" fill="#f59e0b" />
+            <polygon points="2,7.5 12,13 12,22 2,16.5" fill="#d97706" />
+            <polygon points="22,7.5 12,13 12,22 22,16.5" fill="#b45309" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="studio-title">Sunbeam Indie Studio</h1>
+          <span class="studio-subtitle">Phase 1 &bull; Visual Foundation &amp; Isometric Floorplan</span>
+        </div>
+      </div>
+
+      <!-- Primary Navigation -->
+      <nav class="studio-nav" aria-label="Studio Navigation">
+        <button class="nav-btn active" data-view="office">Isometric Office</button>
+        <button class="nav-btn" data-view="team">Team Roster (7)</button>
+        <button class="nav-btn" data-view="zones">Office Zones (6)</button>
+        <button class="nav-btn" data-view="roadmap">Phase Roadmap</button>
+      </nav>
+
+      <!-- Viewport Camera Controls -->
+      <div class="viewport-controls">
+        <span class="mode-badge" title="Phase 1 Static Visual Foundation">PHASE 1: VISUALS</span>
+        <button class="icon-btn" id="btn-zoom-out" title="Zoom Out">&minus;</button>
+        <span id="zoom-readout" class="zoom-label">100%</span>
+        <button class="icon-btn" id="btn-zoom-in" title="Zoom In">+</button>
+        <button class="icon-btn" id="btn-reset-view" title="Center Office">Reset</button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="studio-workspace">
+      <!-- VIEW 1: ISOMETRIC OFFICE (Primary Attraction) -->
+      <section id="view-office" class="view-section active">
+        <div id="iso-viewport" class="iso-viewport">
+          <div id="iso-stage" class="iso-stage">
+            <!-- Procedural Isometric SVG Office & 7 Agents injected by js/office.js -->
+          </div>
+
+          <!-- Floating Zone Quick-Jump Pill Bar -->
+          <div class="zone-jumper">
+            <span class="jumper-label">Focus Zone:</span>
+            <button class="zone-pill active" data-zone="all">Full Studio</button>
+            <button class="zone-pill" data-zone="manager">Manager Office</button>
+            <button class="zone-pill" data-zone="dev">Main Dev Area</button>
+            <button class="zone-pill" data-zone="creative">Creative Design</button>
+            <button class="zone-pill" data-zone="meeting">Meeting Room</button>
+            <button class="zone-pill" data-zone="qa">Testing &amp; QA</button>
+            <button class="zone-pill" data-zone="lounge">Cozy Lounge</button>
+          </div>
+
+          <!-- Floating Helper Tip -->
+          <div class="canvas-hint">
+            Drag to pan &bull; Scroll or +/- to zoom &bull; Click any employee or workstation to inspect
+          </div>
+        </div>
+
+        <!-- Slide-Out Inspection Drawer (Employee or Workstation Details) -->
+        <aside id="inspector-drawer" class="inspector-drawer" aria-live="polite">
+          <div class="drawer-header">
+            <span id="drawer-kicker" class="drawer-kicker">STUDIO INSPECTOR</span>
+            <button id="btn-close-drawer" class="close-btn" aria-label="Close Inspector">&times;</button>
+          </div>
+          <div id="drawer-body" class="drawer-body">
+            <!-- Populated dynamically on click -->
+          </div>
+        </aside>
+      </section>
+
+      <!-- VIEW 2: TEAM ROSTER -->
+      <section id="view-team" class="view-section panel-scroll">
+        <div class="section-header">
+          <h2>AI Studio Employees (7 Agents)</h2>
+          <p>Click any team member to locate and highlight their workstation in the isometric studio.</p>
+        </div>
+        <div id="team-grid" class="cards-grid"></div>
+      </section>
+
+      <!-- VIEW 3: OFFICE ZONES -->
+      <section id="view-zones" class="view-section panel-scroll">
+        <div class="section-header">
+          <h2>Studio Floorplan &amp; Functional Zones</h2>
+          <p>Six distinct, purpose-built areas designed for game production, collaboration, testing, and rest.</p>
+        </div>
+        <div id="zones-grid" class="cards-grid"></div>
+      </section>
+
+      <!-- VIEW 4: PHASE ROADMAP -->
+      <section id="view-roadmap" class="view-section panel-scroll">
+        <div class="section-header">
+          <h2>Development Phases &amp; Architecture Transparency</h2>
+          <p>Built cleanly in phases with clear separation between visual simulation and future real AI integrations.</p>
+        </div>
+        <div id="roadmap-list" class="roadmap-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/agents.js"></script>
+  <script src="js/office.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
