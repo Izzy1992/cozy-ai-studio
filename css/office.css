@@ -4,7 +4,7 @@
   flex: 1;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 50% 42%, #fcf7ee 0%, #e7d7be 100%);
+  background: radial-gradient(circle at 50% 45%, #fcf7ee 0%, #e7d7be 100%);
   overflow: hidden;
   cursor: grab;
   user-select: none;
@@ -19,7 +19,7 @@
   top: 50%;
   left: 50%;
   width: 1360px;
-  height: 880px;
+  height: 860px;
   transform-origin: center center;
   transition: transform 0.18s ease-out;
 }
@@ -32,7 +32,7 @@
   width: 100%;
   height: 100%;
   display: block;
-  filter: drop-shadow(0 24px 38px rgba(51, 38, 29, 0.2));
+  filter: drop-shadow(0 24px 36px rgba(51, 38, 29, 0.2));
 }
 
 /* Interactive SVG Entities */
@@ -42,7 +42,7 @@
 }
 
 .interactive-agent:hover {
-  filter: drop-shadow(0 6px 12px rgba(217, 119, 6, 0.6));
+  filter: drop-shadow(0 6px 12px rgba(217, 119, 6, 0.65));
 }
 
 .interactive-agent.highlighted .selection-ring {
@@ -66,7 +66,7 @@
 }
 
 .zone-hotspot:hover {
-  opacity: 0.92;
+  opacity: 0.94;
 }
 
 /* Subtle Ambient Idle Breathing (Phase 1 Visual Life Only) */
@@ -85,7 +85,7 @@
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 253, 249, 0.9);
+  background: rgba(255, 253, 249, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1.5px solid var(--border-wood);
@@ -134,7 +134,7 @@
   position: absolute;
   bottom: 12px;
   left: 16px;
-  background: rgba(255, 253, 249, 0.88);
+  background: rgba(255, 253, 249, 0.9);
   border: 1px solid var(--border-wood);
   border-radius: 999px;
   padding: 6px 14px;
