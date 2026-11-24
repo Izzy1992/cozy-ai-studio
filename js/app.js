@@ -21,9 +21,9 @@
   const zonesGrid = document.getElementById("zones-grid");
   const roadmapList = document.getElementById("roadmap-list");
 
-  // Camera Pan & Zoom State
+  // Camera Pan & Zoom State (Centered Framing for U-Shaped Atrium)
   let camX = 0;
-  let camY = 12;
+  let camY = 14;
   let camZoom = 1;
   let isDragging = false;
   let dragStartX = 0;
@@ -31,10 +31,9 @@
   let selectedAgentId = null;
 
   function applyCameraTransform() {
-    // Improved scaling so the office occupies a rich, generous portion of desktop & tablet viewports
-    const widthRatio = window.innerWidth / 1220;
-    const heightRatio = (window.innerHeight - 60) / 780;
-    const responsiveBase = Math.min(1.18, Math.max(0.42, Math.min(widthRatio, heightRatio)));
+    const widthRatio = (window.innerWidth - 32) / 1180;
+    const heightRatio = (window.innerHeight - 96) / 730;
+    const responsiveBase = Math.min(1.22, Math.max(0.42, Math.min(widthRatio, heightRatio)));
     const effectiveScale = camZoom * responsiveBase;
 
     isoStage.style.transform = `translate(calc(-50% + ${camX}px), calc(-50% + ${camY}px)) scale(${effectiveScale})`;
@@ -68,7 +67,7 @@
   btnZoomOut.addEventListener("click", () => focusCamera(camX, camY, camZoom - 0.15));
   btnResetView.addEventListener("click", () => {
     zonePills.forEach((p) => p.classList.toggle("active", p.dataset.zone === "all"));
-    focusCamera(0, 12, 1);
+    focusCamera(0, 14, 1);
   });
 
   // Mouse Wheel Zoom
@@ -109,7 +108,7 @@
       zonePills.forEach((p) => p.classList.toggle("active", p === pill));
 
       if (zId === "all") {
-        focusCamera(0, 12, 1);
+        focusCamera(0, 14, 1);
         inspectorDrawer.classList.remove("open");
       } else {
         const zone = ZONES.find((z) => z.id === zId);
@@ -203,7 +202,7 @@
       </div>
 
       <div class="phase-notice">
-        <strong>Phase 1.1 Visual Foundation:</strong> Workstation equipment, character design, and role metadata are active. Autonomous walking, meetings, and task assignment unlock in <strong>Phase 2 &amp; Phase 3</strong>.
+        <strong>Phase 1.3 Visual Foundation:</strong> U-shaped atrium floorplan, custom role workstations, and employee roster are active. Autonomous walking and meetings unlock in <strong>Phase 2</strong>.
       </div>
     `;
     inspectorDrawer.classList.add("open");
