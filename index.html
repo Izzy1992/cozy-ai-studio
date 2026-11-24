@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sunbeam Indie Studio — Phase 1.4: Final Visual Foundation</title>
+  <title>Sunbeam Indie Studio — Phase 2.1 &amp; 2.2: Employee Simulation &amp; Pathfinding</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/office.css" />
 </head>
@@ -21,7 +21,7 @@
         </div>
         <div>
           <h1 class="studio-title">Sunbeam Indie Studio</h1>
-          <span class="studio-subtitle">Phase 1.4 &bull; Final Visual Foundation &amp; Spatial Polish</span>
+          <span class="studio-subtitle">Phase 2.1 &amp; 2.2 &bull; State Machines &amp; Pathfinding</span>
         </div>
       </div>
 
@@ -33,13 +33,23 @@
         <button class="nav-btn" data-view="roadmap">Phase Roadmap</button>
       </nav>
 
-      <!-- Viewport Camera Controls -->
+      <!-- Simulation & Camera Controls -->
       <div class="viewport-controls">
-        <span class="mode-badge" title="Phase 1.4 Final Visual Foundation">PHASE 1.4</span>
+        <div class="sim-controls" role="group" aria-label="Simulation Controls">
+          <button class="sim-btn primary" id="btn-sim-toggle" title="Pause or Resume Employee Simulation">Pause</button>
+          <select id="sim-speed-select" class="sim-select" title="Simulation Speed">
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="2">2x</option>
+            <option value="3">3x</option>
+          </select>
+          <button class="sim-btn" id="btn-sim-reset" title="Return All Employees to Desks">Reset Sim</button>
+        </div>
+
         <button class="icon-btn" id="btn-zoom-out" title="Zoom Out">&minus;</button>
         <span id="zoom-readout" class="zoom-label">100%</span>
         <button class="icon-btn" id="btn-zoom-in" title="Zoom In">+</button>
-        <button class="icon-btn" id="btn-reset-view" title="Center Office">Reset</button>
+        <button class="icon-btn" id="btn-reset-view" title="Center Office">Center</button>
       </div>
     </header>
 
@@ -66,7 +76,8 @@
 
           <!-- Floating Helper Tip -->
           <div class="canvas-hint">
-            Drag to pan &bull; Scroll or +/- to zoom &bull; Click any employee or room to inspect
+            <span id="sim-status-dot" class="status-dot running"></span>
+            <span id="sim-status-text">Simulation Running (1x)</span> &bull; Click any employee to inspect live state &amp; path
           </div>
         </div>
 
@@ -84,7 +95,7 @@
       <section id="view-team" class="view-section panel-scroll">
         <div class="section-header">
           <h2>AI Studio Employees (7 Agents)</h2>
-          <p>Click any team member to locate and highlight their custom workstation in the U-shaped isometric studio.</p>
+          <p>Click any team member to locate and inspect their live simulation state in the isometric studio.</p>
         </div>
         <div id="team-grid" class="cards-grid"></div>
       </section>
@@ -93,7 +104,7 @@
       <section id="view-zones" class="view-section panel-scroll">
         <div class="section-header">
           <h2>U-Shaped Floorplan &amp; Functional Zones</h2>
-          <p>Six spacious wings wrapping around a sunlit central garden &amp; lounge atrium.</p>
+          <p>Six spacious wings connected via an obstacle-free navigation graph around the central garden atrium.</p>
         </div>
         <div id="zones-grid" class="cards-grid"></div>
       </section>
@@ -111,6 +122,7 @@
 
   <script src="js/agents.js"></script>
   <script src="js/office.js"></script>
+  <script src="js/simulation.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
