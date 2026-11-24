@@ -64,9 +64,9 @@ window.Studio.AGENTS = [
     name: "Izmi",
     title: "AI Studio Manager",
     zoneId: "manager",
+    homeNodeId: "desk_izmi",
     workstationName: "Executive Suite Desk #1 (North-West Glass Office)",
     seatPos: { x: 465, y: 245 },
-    status: "At Workstation (Phase 1.4 Final Visual)",
     personality: "Organised, professional, responsible and strategic.",
     roleDescription: "Coordinates all studio agents, distributes tasks, monitors milestones, and prepares daily Director reports.",
     skills: ["Sprint Planning", "Task Triage", "Bottleneck Analysis", "Team Coordination"],
@@ -94,9 +94,9 @@ window.Studio.AGENTS = [
     name: "Izzy",
     title: "Game Designer & Child Experience Designer",
     zoneId: "creative",
+    homeNodeId: "desk_izzy",
     workstationName: "Game Concept & Mechanics Desk #2 (Art & Audio Wing)",
     seatPos: { x: 755, y: 552 },
-    status: "At Workstation (Phase 1.4 Final Visual)",
     personality: "Creative, imaginative and thoughtful.",
     roleDescription: "Crafts engaging, age-appropriate gameplay loops, progression systems, and joyful interactions for young players.",
     skills: ["Child UX (Ages 4–6)", "Gameplay Mechanics", "Level Pacing", "Interactive Storytelling"],
@@ -123,9 +123,9 @@ window.Studio.AGENTS = [
     name: "Isaac",
     title: "Senior Frontend Developer",
     zoneId: "dev",
+    homeNodeId: "desk_isaac",
     workstationName: "Frontend Engineering Rig #3 (Developer Wing)",
     seatPos: { x: 365, y: 548 },
-    status: "At Workstation (Phase 1.4 Final Visual)",
     personality: "Analytical, precise and methodical.",
     roleDescription: "Architects responsive HTML5, CSS3, and modular Vanilla JavaScript systems with clean 60fps performance.",
     skills: ["HTML5 / CSS3", "Vanilla JS", "Responsive UI", "Browser Performance"],
@@ -152,9 +152,9 @@ window.Studio.AGENTS = [
     name: "Hayyan",
     title: "Game Systems & AI Developer",
     zoneId: "dev",
+    homeNodeId: "desk_hayyan",
     workstationName: "Systems & AI Architecture Rig #4 (Developer Wing)",
     seatPos: { x: 525, y: 632 },
-    status: "At Workstation (Phase 1.4 Final Visual)",
     personality: "Technical, logical and curious.",
     roleDescription: "Builds autonomous agent state machines, pathfinding, simulation engines, and future AI service adapters.",
     skills: ["State Machines", "Simulation Logic", "Pathfinding", "AI Orchestration"],
@@ -181,9 +181,9 @@ window.Studio.AGENTS = [
     name: "Anis",
     title: "Art Director & Environment Designer",
     zoneId: "creative",
+    homeNodeId: "desk_anis",
     workstationName: "Pen-Display & Palette Station #5 (Art & Audio Wing)",
     seatPos: { x: 890, y: 628 },
-    status: "At Workstation (Phase 1.4 Final Visual)",
     personality: "Artistic, observant and imaginative.",
     roleDescription: "Establishes warm visual direction, isometric environments, color palettes, and expressive character designs.",
     skills: ["Isometric Art", "Color Theory", "Environment Design", "Character Concepts"],
@@ -210,9 +210,9 @@ window.Studio.AGENTS = [
     name: "Abang",
     title: "Sound Engineer, Audio & Animation Designer",
     zoneId: "creative",
+    homeNodeId: "desk_abang",
     workstationName: "Sound Engineering & Motion Rig #6 (Art & Audio Wing)",
     seatPos: { x: 1020, y: 552 },
-    status: "At Workstation (Phase 1.4 Final Visual)",
     personality: "Expressive, creative and detail-oriented.",
     roleDescription: "Produces joyful sound effects, Web Audio synthesizers, studio mixes, and smooth character animations.",
     skills: ["Sound Engineering", "Web Audio SFX", "Character Motion", "Studio Mixing"],
@@ -239,9 +239,9 @@ window.Studio.AGENTS = [
     name: "Sofea",
     title: "QA Engineer & Child Safety Reviewer",
     zoneId: "qa",
+    homeNodeId: "desk_sofea",
     workstationName: "Multi-Device QA & Child Safety Lab #7 (North-East Wing)",
     seatPos: { x: 1055, y: 390 },
-    status: "At Workstation (Phase 1.4 Final Visual)",
     personality: "Careful, systematic and responsible.",
     roleDescription: "Verifies cross-browser stability, responsive layouts, and strict child-safety standards across every studio release.",
     skills: ["Cross-Device QA", "Child Safety Audits", "Responsive Testing", "Bug Reporting"],
@@ -266,33 +266,33 @@ window.Studio.AGENTS = [
 
 window.Studio.ROADMAP = [
   {
-    phase: "Phase 1 — Visual Foundation (1.4 Final Polish)",
-    status: "ACTIVE (FINAL PHASE 1 BUILD)",
-    active: true,
-    details: "Complete U-shaped Garden Atrium floorplan with grounded glass partitions, unobstructed Phase 2 walkways, social Garden Lounge with fountain & sofas, and 7 custom role workstations."
+    phase: "Phase 1 — Visual Foundation",
+    status: "COMPLETED & APPROVED",
+    active: false,
+    details: "U-shaped Garden Atrium isometric floorplan, grounded glass partitions, unobstructed doorways, 6 distinct zones, and 7 custom role workstations."
   },
   {
-    phase: "Phase 2 — Employee Simulation",
-    status: "NEXT (READY UPON PHASE 1.4 APPROVAL)",
+    phase: "Phase 2.1 & 2.2 — State Machines & Pathfinding",
+    status: "ACTIVE (CURRENT BUILD)",
+    active: true,
+    details: "Independent employee state machines (WORKING, THINKING, IDLE, WALKING, USING_LOUNGE, IN_MEETING, RETURNING_TO_DESK) and obstacle-aware BFS waypoint pathfinding across all rooms."
+  },
+  {
+    phase: "Phase 2.3 & 2.4 — Autonomous Routines & Meetings",
+    status: "NEXT MILESTONE",
     active: false,
-    details: "Autonomous state machines (IDLE, WALKING, WORKING, THINKING, IN_MEETING, ON_BREAK), smooth pathfinding along the atrium stepping-stone routes, coffee breaks, and meeting room gatherings."
+    details: "Rich daily work schedules, simulated peer conversations, and coordinated team gatherings in the Meeting Room."
   },
   {
     phase: "Phase 3 — Management & Kanban Systems",
     status: "PLANNED",
     active: false,
-    details: "Full Kanban task board (Backlog to Completed), project creation, task assignment, simulated team chat, meeting notes generator, and real-time Studio Dashboard metrics."
+    details: "Full Kanban task board (Backlog to Completed), project creation, task assignment, simulated team chat, meeting notes generator, and Studio Dashboard metrics."
   },
   {
-    phase: "Phase 4 — Persistence & Reliability",
+    phase: "Phase 4 & 5 — Persistence & Future Real AI Integration",
     status: "PLANNED",
     active: false,
-    details: "Versioned LocalStorage state saving, JSON export/import backups, safe reset confirmations, and mobile performance optimization."
-  },
-  {
-    phase: "Phase 5 — Future Real AI Integration",
-    status: "PLANNED",
-    active: false,
-    details: "Clean orchestration service contracts designed to connect agents to a secure external AI backend without exposing API keys in public repositories."
+    details: "Versioned LocalStorage state saving, JSON export/import backups, and clean orchestration service contracts for secure external AI execution."
   }
 ];
