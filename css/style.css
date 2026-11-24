@@ -42,8 +42,8 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 9px 20px;
+  gap: 10px;
+  padding: 8px 18px;
   background: var(--bg-warm-panel);
   border-bottom: 2px solid var(--border-wood);
   z-index: 30;
@@ -57,8 +57,8 @@ html, body {
 }
 
 .brand-emblem {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
   background: var(--accent-amber-soft);
   border: 1.5px solid #f59e0b;
@@ -68,7 +68,7 @@ html, body {
 }
 
 .studio-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: var(--text-espresso);
   line-height: 1.15;
@@ -83,7 +83,7 @@ html, body {
 /* Navigation */
 .studio-nav {
   display: flex;
-  gap: 5px;
+  gap: 4px;
   background: var(--bg-sand);
   padding: 4px;
   border-radius: 12px;
@@ -93,9 +93,9 @@ html, body {
 .nav-btn {
   background: transparent;
   border: none;
-  padding: 7px 14px;
+  padding: 6px 12px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--text-muted);
   cursor: pointer;
@@ -113,22 +113,60 @@ html, body {
   box-shadow: 0 2px 6px rgba(51, 38, 29, 0.12);
 }
 
-/* Viewport Controls */
+/* Simulation & Viewport Controls */
 .viewport-controls {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.mode-badge {
-  background: var(--accent-sage-soft);
-  color: var(--accent-sage);
-  border: 1px solid #b5d6bf;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 999px;
+.sim-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-sand);
+  padding: 3px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border-wood);
   margin-right: 4px;
+}
+
+.sim-btn {
+  background: var(--bg-warm-panel);
+  border: 1px solid var(--border-wood);
+  color: var(--text-espresso);
+  border-radius: 7px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.sim-btn:hover {
+  background: #f5ebd9;
+}
+
+.sim-btn.primary {
+  background: var(--accent-sage);
+  color: #ffffff;
+  border-color: #355940;
+}
+
+.sim-btn.primary.paused {
+  background: var(--accent-amber);
+  border-color: #b45309;
+}
+
+.sim-select {
+  background: var(--bg-warm-panel);
+  border: 1px solid var(--border-wood);
+  color: var(--text-espresso);
+  border-radius: 7px;
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .icon-btn {
@@ -136,8 +174,8 @@ html, body {
   border: 1.5px solid var(--border-wood);
   color: var(--text-espresso);
   border-radius: 8px;
-  padding: 5px 10px;
-  font-size: 13px;
+  padding: 4px 9px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -150,7 +188,7 @@ html, body {
 .zoom-label {
   font-size: 12px;
   font-weight: 700;
-  min-width: 42px;
+  min-width: 40px;
   text-align: center;
   color: var(--text-muted);
 }
@@ -319,16 +357,35 @@ html, body {
   color: var(--text-muted);
 }
 
-/* Responsive Breakpoints */
-@media (max-width: 820px) {
+/* Live State Badges in Inspector */
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.state-WORKING { background: #dbeafe; color: #1d4ed8; }
+.state-THINKING { background: #fef3c7; color: #b45309; }
+.state-IDLE { background: #f1f5f9; color: #475569; }
+.state-WALKING, .state-RETURNING_TO_DESK { background: #dcfce7; color: #15803d; }
+.state-USING_LOUNGE, .state-TAKING_BREAK { background: #fae8ff; color: #86198f; }
+.state-IN_MEETING { background: #ccfbf1; color: #0f766e; }
+
+@media (max-width: 900px) {
   .studio-topbar {
     padding: 8px 12px;
   }
-  .studio-subtitle, .mode-badge, .canvas-hint {
+  .studio-subtitle, .canvas-hint {
     display: none;
   }
   .nav-btn {
-    padding: 6px 10px;
+    padding: 5px 9px;
     font-size: 12px;
   }
 }
