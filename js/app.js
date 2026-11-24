@@ -1,5 +1,5 @@
 (function () {
-  const { AGENTS, ZONES, ROADMAP, OfficeRenderer } = window.Studio;
+  const { AGENTS, ZONES, ROADMAP, OfficeRenderer, SimulationEngine } = window.Studio;
 
   // DOM Elements
   const navButtons = document.querySelectorAll(".nav-btn");
@@ -12,6 +12,13 @@
   const btnResetView = document.getElementById("btn-reset-view");
   const zonePills = document.querySelectorAll(".zone-pill");
 
+  // Simulation Control Elements
+  const btnSimToggle = document.getElementById("btn-sim-toggle");
+  const simSpeedSelect = document.getElementById("sim-speed-select");
+  const btnSimReset = document.getElementById("btn-sim-reset");
+  const simStatusDot = document.getElementById("sim-status-dot");
+  const simStatusText = document.getElementById("sim-status-text");
+
   const inspectorDrawer = document.getElementById("inspector-drawer");
   const drawerKicker = document.getElementById("drawer-kicker");
   const drawerBody = document.getElementById("drawer-body");
@@ -21,7 +28,7 @@
   const zonesGrid = document.getElementById("zones-grid");
   const roadmapList = document.getElementById("roadmap-list");
 
-  // Camera Pan & Zoom State (Centered Framing for U-Shaped Atrium)
+  // Camera Pan & Zoom State
   let camX = 0;
   let camY = 14;
   let camZoom = 1;
@@ -47,10 +54,43 @@
     applyCameraTransform();
   }
 
-  // Render Isometric Office SVG
+  // Render Isometric Office SVG & Start Phase 2.1/2.2 Simulation Engine
   OfficeRenderer.renderOffice(isoStage, AGENTS, ZONES);
   applyCameraTransform();
   window.addEventListener("resize", applyCameraTransform);
+
+  SimulationEngine.init(AGENTS, () => {
+    if (selectedAgentId && inspectorDrawer.classList.contains("open")) {
+      updateLiveInspectorTelemetry(selectedAgentId);
+    }
+  });
+
+  // Simulation Toolbar Controls
+  btnSimToggle.addEventListener("click", () => {
+    const nextRunning = !SimulationEngine.isRunning();
+    SimulationEngine.setRunning(nextRunning);
+    btnSimToggle.textContent = nextRunning ? "Pause" : "Resume";
+    btnSimToggle.classList.toggle("paused", !nextRunning);
+    isoStage.classList.toggle("sim-paused", !nextRunning);
+    simStatusDot.className = `status-dot ${nextRunning ? "running" : "paused"}`;
+    simStatusText.textContent = nextRunning
+      ? `Simulation Running (${simSpeedSelect.value}x)`
+      : "Simulation Paused";
+  });
+
+  simSpeedSelect.addEventListener("change", () => {
+    SimulationEngine.setSpeed(simSpeedSelect.value);
+    if (SimulationEngine.isRunning()) {
+      simStatusText.textContent = `Simulation Running (${simSpeedSelect.value}x)`;
+    }
+  });
+
+  btnSimReset.addEventListener("click", () => {
+    SimulationEngine.reset(AGENTS);
+    if (selectedAgentId && inspectorDrawer.classList.contains("open")) {
+      updateLiveInspectorTelemetry(selectedAgentId);
+    }
+  });
 
   // Navigation Switching
   function switchView(viewName) {
@@ -77,7 +117,7 @@
     focusCamera(camX, camY, camZoom + delta);
   }, { passive: false });
 
-  // Pointer Panning (Mouse & Touch)
+  // Pointer Panning
   isoViewport.addEventListener("pointerdown", (e) => {
     if (e.target.closest(".interactive-agent") || e.target.closest(".zone-pill") || e.target.closest(".inspector-drawer")) {
       return;
@@ -120,7 +160,7 @@
     });
   });
 
-  // Agent & Zone Click Handlers inside SVG
+  // Agent & Zone Click Handlers
   isoStage.addEventListener("click", (e) => {
     const agentEl = e.target.closest(".interactive-agent");
     if (agentEl) {
@@ -146,6 +186,27 @@
     document.querySelectorAll(".interactive-agent").forEach((el) => el.classList.remove("highlighted"));
   }
 
+  function updateLiveInspectorTelemetry(agentId) {
+    const st = SimulationEngine.getAgentState(agentId);
+    if (!st) return;
+
+    const badgeEl = document.getElementById("live-state-badge");
+    const actEl = document.getElementById("live-activity-text");
+    const locEl = document.getElementById("live-location-text");
+    const nextEl = document.getElementById("live-next-text");
+
+    if (badgeEl) {
+      badgeEl.className = `state-badge state-${st.state}`;
+      badgeEl.textContent = st.state.replace(/_/g, " ");
+    }
+    if (actEl) actEl.textContent = st.currentActivity;
+    if (locEl) {
+      const z = ZONES.find((zone) => zone.id === st.currentZone);
+      locEl.textContent = z ? z.name : st.currentZone;
+    }
+    if (nextEl) nextEl.textContent = st.nextIntendedActivity.replace(/_/g, " ");
+  }
+
   function selectAgent(agent) {
     switchView("office");
     clearAgentHighlight();
@@ -155,12 +216,9 @@
     if (el) el.classList.add("highlighted");
 
     const zone = ZONES.find((z) => z.id === agent.zoneId);
-    if (zone) {
-      zonePills.forEach((p) => p.classList.toggle("active", p.dataset.zone === zone.id));
-      focusCamera(zone.focus.x, zone.focus.y, zone.focus.zoom);
-    }
+    const st = SimulationEngine.getAgentState(agent.id);
 
-    drawerKicker.textContent = `${agent.code} • EMPLOYEE PROFILE`;
+    drawerKicker.textContent = `${agent.code} • LIVE SIMULATION INSPECTOR`;
     drawerBody.innerHTML = `
       <div class="inspector-hero">
         <div class="avatar-circle" style="background:${agent.appearance.accent}; border-color:${agent.appearance.shirt};">
@@ -173,17 +231,34 @@
         <div>
           <h3 style="font-size:17px; font-weight:800;">${agent.name}</h3>
           <div style="font-size:12px; font-weight:700; color:#c4552d;">${agent.title}</div>
-          <div style="font-size:11px; color:#447252; font-weight:700; margin-top:2px;">&bull; ${agent.status}</div>
+        </div>
+      </div>
+
+      <div class="live-telemetry-card">
+        <div class="telemetry-row">
+          <span style="font-weight:700; color:#756354;">Current State</span>
+          <span id="live-state-badge" class="state-badge state-${st ? st.state : 'WORKING'}">${st ? st.state.replace(/_/g, " ") : "WORKING"}</span>
+        </div>
+        <div class="telemetry-row">
+          <span style="font-weight:700; color:#756354;">Current Zone</span>
+          <strong id="live-location-text">${zone ? zone.name : ""}</strong>
+        </div>
+        <div style="font-size:12.5px; margin-top:2px;">
+          <span style="font-weight:700; color:#756354;">Activity:</span>
+          <span id="live-activity-text">${st ? st.currentActivity : ""}</span>
+        </div>
+        <div style="font-size:11.5px; color:#756354;">
+          <strong>Next State:</strong> <span id="live-next-text">${st ? st.nextIntendedActivity.replace(/_/g, " ") : "THINKING"}</span>
         </div>
       </div>
 
       <div class="inspector-section">
-        <h4>Assigned Workstation</h4>
-        <p><strong>${agent.workstationName}</strong> (${zone ? zone.name : ""})</p>
+        <h4>Home Workstation</h4>
+        <p><strong>${agent.workstationName}</strong></p>
       </div>
 
       <div class="inspector-section">
-        <h4>Personality &amp; Working Style</h4>
+        <h4>Personality &amp; Role</h4>
         <p>${agent.personality} ${agent.roleDescription}</p>
       </div>
 
@@ -202,7 +277,7 @@
       </div>
 
       <div class="phase-notice">
-        <strong>Phase 1.3 Visual Foundation:</strong> U-shaped atrium floorplan, custom role workstations, and employee roster are active. Autonomous walking and meetings unlock in <strong>Phase 2</strong>.
+        <strong>Simulated Activity (Phase 2.1 &amp; 2.2):</strong> State transitions and BFS waypoint pathfinding run locally in the browser without external AI APIs.
       </div>
     `;
     inspectorDrawer.classList.add("open");
@@ -226,12 +301,12 @@
             ? `<ul class="inspector-list">${zoneAgents
                 .map((a) => `<li><strong>${a.name}</strong> — ${a.title}</li>`)
                 .join("")}</ul>`
-            : `<p>Shared communal space used during Phase 2 simulated meetings and coffee breaks.</p>`
+            : `<p>Shared communal destination accessible via the Phase 2.2 navigation graph.</p>`
         }
       </div>
 
       <div class="phase-notice">
-        Tip: Click any character directly in the isometric studio to inspect their personal workstation and responsibilities.
+        Tip: Click any moving or working employee directly in the office to inspect their live state machine.
       </div>
     `;
     inspectorDrawer.classList.add("open");
@@ -258,12 +333,12 @@
             </div>
           </div>
           <p style="font-size:13px; color:#5c4a3c; line-height:1.4;">${agent.roleDescription}</p>
-          <div style="font-size:12px; color:#756354;"><strong>Station:</strong> ${zone ? zone.name : ""}</div>
+          <div style="font-size:12px; color:#756354;"><strong>Home Station:</strong> ${zone ? zone.name : ""}</div>
           <div class="tag-row">
             ${agent.skills.map((s) => `<span class="skill-tag">${s}</span>`).join("")}
           </div>
           <div class="card-actions">
-            <button class="primary-pill-btn" data-locate-agent="${agent.id}">Locate in Office &rarr;</button>
+            <button class="primary-pill-btn" data-locate-agent="${agent.id}">Inspect in Office &rarr;</button>
           </div>
         </article>
       `;
