@@ -69,14 +69,61 @@
   opacity: 0.94;
 }
 
-/* Subtle Ambient Idle Breathing (Phase 1 Visual Life Only) */
+/* State-Driven Character Animations */
 .agent-body-bob {
   animation: gentleBob 2.8s infinite ease-in-out;
+}
+
+.interactive-agent.is-walking .agent-body-bob {
+  animation: walkBounce 0.36s infinite ease-in-out;
+}
+
+.interactive-agent.is-walking .leg-left {
+  animation: legSwingLeft 0.36s infinite ease-in-out;
+  transform-origin: -4px -15px;
+}
+
+.interactive-agent.is-walking .leg-right {
+  animation: legSwingRight 0.36s infinite ease-in-out;
+  transform-origin: 4px -15px;
+}
+
+.interactive-agent.is-working .arm-left,
+.interactive-agent.is-working .arm-right {
+  animation: typingPulse 0.45s infinite alternate ease-in-out;
+}
+
+.sim-paused .agent-body-bob,
+.sim-paused .leg-left,
+.sim-paused .leg-right,
+.sim-paused .arm-left,
+.sim-paused .arm-right {
+  animation-play-state: paused !important;
 }
 
 @keyframes gentleBob {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-2px); }
+}
+
+@keyframes walkBounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3.5px); }
+}
+
+@keyframes legSwingLeft {
+  0%, 100% { transform: rotate(-14deg); }
+  50% { transform: rotate(14deg); }
+}
+
+@keyframes legSwingRight {
+  0%, 100% { transform: rotate(14deg); }
+  50% { transform: rotate(-14deg); }
+}
+
+@keyframes typingPulse {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-1.8px); }
 }
 
 /* Floating Zone Quick-Jump Bar */
@@ -134,7 +181,7 @@
   position: absolute;
   bottom: 12px;
   left: 16px;
-  background: rgba(255, 253, 249, 0.9);
+  background: rgba(255, 253, 249, 0.92);
   border: 1px solid var(--border-wood);
   border-radius: 999px;
   padding: 6px 14px;
@@ -142,6 +189,25 @@
   font-weight: 600;
   color: var(--text-muted);
   z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.running {
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.status-dot.paused {
+  background: #f59e0b;
 }
 
 /* Slide-Out Inspector Drawer */
@@ -150,7 +216,7 @@
   top: 12px;
   right: 14px;
   bottom: 12px;
-  width: 345px;
+  width: 350px;
   max-width: calc(100vw - 28px);
   background: var(--bg-warm-panel);
   border: 2px solid var(--border-wood);
@@ -229,6 +295,23 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.live-telemetry-card {
+  background: var(--bg-cream);
+  border: 1.5px solid var(--border-wood);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.telemetry-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
 }
 
 .phase-notice {
