@@ -23,7 +23,7 @@
 
   // Camera Pan & Zoom State
   let camX = 0;
-  let camY = 0;
+  let camY = 12;
   let camZoom = 1;
   let isDragging = false;
   let dragStartX = 0;
@@ -31,9 +31,12 @@
   let selectedAgentId = null;
 
   function applyCameraTransform() {
-    // Auto-scale slightly on smaller screens so the full isometric office fits comfortably
-    const responsiveBase = Math.min(1, window.innerWidth / 1180);
+    // Improved scaling so the office occupies a rich, generous portion of desktop & tablet viewports
+    const widthRatio = window.innerWidth / 1220;
+    const heightRatio = (window.innerHeight - 60) / 780;
+    const responsiveBase = Math.min(1.18, Math.max(0.42, Math.min(widthRatio, heightRatio)));
     const effectiveScale = camZoom * responsiveBase;
+
     isoStage.style.transform = `translate(calc(-50% + ${camX}px), calc(-50% + ${camY}px)) scale(${effectiveScale})`;
     zoomReadout.textContent = `${Math.round(camZoom * 100)}%`;
   }
@@ -41,7 +44,7 @@
   function focusCamera(x, y, zoom) {
     camX = x;
     camY = y;
-    camZoom = Math.min(1.85, Math.max(0.65, zoom));
+    camZoom = Math.min(1.95, Math.max(0.65, zoom));
     applyCameraTransform();
   }
 
@@ -65,7 +68,7 @@
   btnZoomOut.addEventListener("click", () => focusCamera(camX, camY, camZoom - 0.15));
   btnResetView.addEventListener("click", () => {
     zonePills.forEach((p) => p.classList.toggle("active", p.dataset.zone === "all"));
-    focusCamera(0, 0, 1);
+    focusCamera(0, 12, 1);
   });
 
   // Mouse Wheel Zoom
@@ -106,7 +109,7 @@
       zonePills.forEach((p) => p.classList.toggle("active", p === pill));
 
       if (zId === "all") {
-        focusCamera(0, 0, 1);
+        focusCamera(0, 12, 1);
         inspectorDrawer.classList.remove("open");
       } else {
         const zone = ZONES.find((z) => z.id === zId);
@@ -170,8 +173,8 @@
         </div>
         <div>
           <h3 style="font-size:17px; font-weight:800;">${agent.name}</h3>
-          <div style="font-size:12px; font-weight:700; color:#c85a32;">${agent.title}</div>
-          <div style="font-size:11px; color:#4d7c5b; font-weight:700; margin-top:2px;">&bull; ${agent.status}</div>
+          <div style="font-size:12px; font-weight:700; color:#c4552d;">${agent.title}</div>
+          <div style="font-size:11px; color:#447252; font-weight:700; margin-top:2px;">&bull; ${agent.status}</div>
         </div>
       </div>
 
@@ -200,7 +203,7 @@
       </div>
 
       <div class="phase-notice">
-        <strong>Phase 1 Visual Foundation:</strong> Workstation layout, character model, and role metadata are active. Autonomous walking, meetings, and task assignment unlock in <strong>Phase 2 &amp; Phase 3</strong>.
+        <strong>Phase 1.1 Visual Foundation:</strong> Workstation equipment, character design, and role metadata are active. Autonomous walking, meetings, and task assignment unlock in <strong>Phase 2 &amp; Phase 3</strong>.
       </div>
     `;
     inspectorDrawer.classList.add("open");
@@ -214,7 +217,7 @@
     drawerBody.innerHTML = `
       <div>
         <h3 style="font-size:18px; font-weight:800; margin-bottom:4px;">${zone.name}</h3>
-        <p style="font-size:13px; color:#786657; line-height:1.45;">${zone.description}</p>
+        <p style="font-size:13px; color:#756354; line-height:1.45;">${zone.description}</p>
       </div>
 
       <div class="inspector-section">
@@ -224,12 +227,12 @@
             ? `<ul class="inspector-list">${zoneAgents
                 .map((a) => `<li><strong>${a.name}</strong> — ${a.title}</li>`)
                 .join("")}</ul>`
-            : `<p>Shared communal area used during Phase 2 simulated meetings and coffee breaks.</p>`
+            : `<p>Shared communal space used during Phase 2 simulated meetings and coffee breaks.</p>`
         }
       </div>
 
       <div class="phase-notice">
-        Tip: Click any character directly in the isometric studio to inspect their personal desk and responsibilities.
+        Tip: Click any character directly in the isometric studio to inspect their personal workstation and responsibilities.
       </div>
     `;
     inspectorDrawer.classList.add("open");
@@ -250,13 +253,13 @@
               </svg>
             </div>
             <div>
-              <div style="font-size:10px; font-weight:800; color:#786657;">${agent.code}</div>
+              <div style="font-size:10px; font-weight:800; color:#756354;">${agent.code}</div>
               <div class="card-title">${agent.name}</div>
               <div class="card-role">${agent.title}</div>
             </div>
           </div>
           <p style="font-size:13px; color:#5c4a3c; line-height:1.4;">${agent.roleDescription}</p>
-          <div style="font-size:12px; color:#786657;"><strong>Station:</strong> ${zone ? zone.name : ""}</div>
+          <div style="font-size:12px; color:#756354;"><strong>Station:</strong> ${zone ? zone.name : ""}</div>
           <div class="tag-row">
             ${agent.skills.map((s) => `<span class="skill-tag">${s}</span>`).join("")}
           </div>
