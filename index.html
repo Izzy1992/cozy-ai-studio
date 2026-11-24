@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cozy AI Game Studio — Phase 1: Isometric Office</title>
+  <title>Sunbeam Indie Studio — Phase 1.1: Isometric Office</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/office.css" />
 </head>
@@ -21,7 +21,7 @@
         </div>
         <div>
           <h1 class="studio-title">Sunbeam Indie Studio</h1>
-          <span class="studio-subtitle">Phase 1 &bull; Visual Foundation &amp; Isometric Floorplan</span>
+          <span class="studio-subtitle">Phase 1.1 &bull; Visual Foundation Refinement</span>
         </div>
       </div>
 
@@ -35,7 +35,7 @@
 
       <!-- Viewport Camera Controls -->
       <div class="viewport-controls">
-        <span class="mode-badge" title="Phase 1 Static Visual Foundation">PHASE 1: VISUALS</span>
+        <span class="mode-badge" title="Phase 1.1 Visual Foundation Refinement">PHASE 1.1</span>
         <button class="icon-btn" id="btn-zoom-out" title="Zoom Out">&minus;</button>
         <span id="zoom-readout" class="zoom-label">100%</span>
         <button class="icon-btn" id="btn-zoom-in" title="Zoom In">+</button>
@@ -66,19 +66,17 @@
 
           <!-- Floating Helper Tip -->
           <div class="canvas-hint">
-            Drag to pan &bull; Scroll or +/- to zoom &bull; Click any employee or workstation to inspect
+            Drag to pan &bull; Scroll or +/- to zoom &bull; Click any employee or room to inspect
           </div>
         </div>
 
-        <!-- Slide-Out Inspection Drawer (Employee or Workstation Details) -->
+        <!-- Slide-Out Inspection Drawer -->
         <aside id="inspector-drawer" class="inspector-drawer" aria-live="polite">
           <div class="drawer-header">
             <span id="drawer-kicker" class="drawer-kicker">STUDIO INSPECTOR</span>
             <button id="btn-close-drawer" class="close-btn" aria-label="Close Inspector">&times;</button>
           </div>
-          <div id="drawer-body" class="drawer-body">
-            <!-- Populated dynamically on click -->
-          </div>
+          <div id="drawer-body" class="drawer-body"></div>
         </aside>
       </section>
 
@@ -86,7 +84,7 @@
       <section id="view-team" class="view-section panel-scroll">
         <div class="section-header">
           <h2>AI Studio Employees (7 Agents)</h2>
-          <p>Click any team member to locate and highlight their workstation in the isometric studio.</p>
+          <p>Click any team member to locate and highlight their custom workstation in the isometric studio.</p>
         </div>
         <div id="team-grid" class="cards-grid"></div>
       </section>
@@ -95,7 +93,7 @@
       <section id="view-zones" class="view-section panel-scroll">
         <div class="section-header">
           <h2>Studio Floorplan &amp; Functional Zones</h2>
-          <p>Six distinct, purpose-built areas designed for game production, collaboration, testing, and rest.</p>
+          <p>Six distinct, purpose-built architectural areas designed for game production, collaboration, testing, and rest.</p>
         </div>
         <div id="zones-grid" class="cards-grid"></div>
       </section>
