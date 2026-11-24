@@ -16,7 +16,6 @@ window.Studio.OfficeRenderer = (function () {
     `;
   }
 
-  // Grounded Architectural Partition Wall with Solid Floor Plinth & End Posts
   function isoWallSegment(x1, y1, x2, y2, h, options = {}) {
     const {
       wallColor = "#f5ebd9",
@@ -44,7 +43,6 @@ window.Studio.OfficeRenderer = (function () {
       `;
     }
 
-    // Solid grounded floor plinth so partitions never appear to float
     const floorPlinth = `
       <polygon points="${x1 - nx * 0.5},${y1 - ny * 0.5} ${x2 - nx * 0.5},${y2 - ny * 0.5} ${x2 + nx * 1.4},${y2 + ny * 1.4} ${x1 + nx * 1.4},${y1 + ny * 1.4}"
         fill="#78583a" opacity="0.45"/>
@@ -58,23 +56,19 @@ window.Studio.OfficeRenderer = (function () {
 
     return `
       <g>
-        <!-- Cast Floor Shadow -->
         <polygon points="${x1},${y1} ${x2},${y2} ${x2 + nx * 2.4},${y2 + ny * 2.4} ${x1 + nx * 2.4},${y1 + ny * 2.4}"
           fill="rgba(51,38,29,0.14)"/>
-        <!-- Main Wall Panel -->
         <polygon points="${x1},${y1} ${x2},${y2} ${x2},${y2 - h} ${x1},${y1 - h}"
           fill="${faceFill}" stroke="${faceStroke}" stroke-width="1.5"/>
         ${floorPlinth}
         ${glassMullions}
         ${topCap}
-        <!-- Grounded Anchor Posts at Both Ends -->
         ${isoBox(x1, y1, 3.5, 2.2, h + 2, { top: trimColor, left: "#5c4033", right: trimColor })}
         ${isoBox(x2, y2, 3.5, 2.2, h + 2, { top: trimColor, left: "#5c4033", right: trimColor })}
       </g>
     `;
   }
 
-  // Lush Indoor Atrium Tree in Wooden Planter Box
   function renderAtriumTree(x, y, scale = 1) {
     return `
       <g transform="translate(${x}, ${y}) scale(${scale})">
@@ -90,7 +84,6 @@ window.Studio.OfficeRenderer = (function () {
     `;
   }
 
-  // Potted Indoor Plant
   function renderPlant(x, y, scale = 1) {
     return `
       <g transform="translate(${x}, ${y}) scale(${scale})">
@@ -106,7 +99,6 @@ window.Studio.OfficeRenderer = (function () {
     `;
   }
 
-  // Serene Stone Water Feature in Garden Lounge
   function renderWaterFeature(x, y) {
     return `
       <g transform="translate(${x}, ${y})">
@@ -122,7 +114,6 @@ window.Studio.OfficeRenderer = (function () {
     `;
   }
 
-  // Warm Garden Lantern Post
   function renderGardenLantern(x, y) {
     return `
       <g transform="translate(${x}, ${y})">
@@ -134,7 +125,6 @@ window.Studio.OfficeRenderer = (function () {
     `;
   }
 
-  // Bookshelf & Storage Cabinet
   function renderBookshelf(x, y) {
     return `
       <g transform="translate(${x}, ${y})">
@@ -184,7 +174,6 @@ window.Studio.OfficeRenderer = (function () {
     `;
   }
 
-  // Seven Role-Specific Workstations
   function renderWorkstation(x, y, roleType) {
     const isManager = roleType === "manager";
     const deskTop = isManager ? "#c68b59" : "#ebd8be";
@@ -194,7 +183,6 @@ window.Studio.OfficeRenderer = (function () {
     let rigSVG = "";
 
     if (roleType === "manager") {
-      // Izmi — Studio Manager: Executive wide strategy monitor, folders & notebook
       rigSVG = `
         ${isoBox(-6, -26, 16, 6, 18, { top: "#1e293b", left: "#0f172a", right: "#334155" })}
         <polygon points="-20,-41 8,-27 8,-14 -20,-28" fill="#fbbf24"/>
@@ -202,7 +190,6 @@ window.Studio.OfficeRenderer = (function () {
         <polygon points="12,-17 26,-10 18,-5 4,-12" fill="#fef3c7" stroke="#f59e0b" stroke-width="0.8"/>
       `;
     } else if (roleType === "designer") {
-      // Izzy — Game Designer: Concept display, level sketchbook & game tokens
       rigSVG = `
         ${isoBox(-10, -26, 14, 6, 17, { top: "#334155", left: "#1e293b", right: "#0f172a" })}
         <polygon points="-22,-40 2,-28 2,-16 -22,-28" fill="#38bdf8"/>
@@ -211,7 +198,6 @@ window.Studio.OfficeRenderer = (function () {
         <circle cx="12" cy="-16" r="2.8" fill="#facc15"/>
       `;
     } else if (roleType === "frontend") {
-      // Isaac — Senior Frontend Developer: Dual ultrawide coding monitors, mouse & UI reference binder
       rigSVG = `
         ${isoBox(-16, -29, 13, 5, 17, { top: "#334155", left: "#1e293b", right: "#0f172a" })}
         <polygon points="-27,-43 -5,-32 -5,-20 -27,-31" fill="#38bdf8"/>
@@ -221,7 +207,6 @@ window.Studio.OfficeRenderer = (function () {
         <polygon points="-24,-13 -14,-8 -18,-5 -28,-10" fill="#dbeafe" stroke="#2563eb" stroke-width="0.8"/>
       `;
     } else if (roleType === "systems") {
-      // Hayyan — Game Systems & AI Developer: Dual systems monitors, dev notes & server tower
       rigSVG = `
         ${isoBox(-16, -29, 13, 5, 17, { top: "#334155", left: "#1e293b", right: "#0f172a" })}
         <polygon points="-27,-43 -5,-32 -5,-20 -27,-31" fill="#a78bfa"/>
@@ -232,7 +217,6 @@ window.Studio.OfficeRenderer = (function () {
         <polygon points="-24,-13 -14,-8 -18,-5 -28,-10" fill="#ede9fe" stroke="#7c3aed" stroke-width="0.8"/>
       `;
     } else if (roleType === "art") {
-      // Anis — Art Director: Color-calibrated display, digital pen tablet, color swatches & brush cup
       rigSVG = `
         ${isoBox(-12, -27, 14, 6, 18, { top: "#334155", left: "#1e293b", right: "#0f172a" })}
         <polygon points="-24,-42 0,-30 0,-17 -24,-29" fill="#f472b6"/>
@@ -242,7 +226,6 @@ window.Studio.OfficeRenderer = (function () {
         <polygon points="-20,-16 -10,-11 -14,-7 -24,-12" fill="#38bdf8"/>
       `;
     } else if (roleType === "audio") {
-      // Abang — Sound Engineer & Audio Studio Rig: Dual speakers, waveform monitor, MIDI mixer & headphones
       rigSVG = `
         ${isoBox(-26, -32, 6, 5, 15, { top: "#1e293b", left: "#0f172a", right: "#334155" })}
         <circle cx="-22" cy="-35" r="2.8" fill="#fbbf24"/>
@@ -253,7 +236,6 @@ window.Studio.OfficeRenderer = (function () {
         <polygon points="4,-12 16,-6 10,-2 -2,-8" fill="#1e293b"/>
       `;
     } else if (roleType === "qa") {
-      // Sofea — QA & Child Safety Reviewer: Dual bug-tracking displays, tablet, mobile phone & QA checklist
       rigSVG = `
         ${isoBox(-16, -28, 13, 5, 17, { top: "#334155", left: "#1e293b", right: "#0f172a" })}
         <polygon points="-27,-42 -5,-31 -5,-19 -27,-30" fill="#4ade80"/>
@@ -313,19 +295,26 @@ window.Studio.OfficeRenderer = (function () {
     }
 
     return `
-      <g class="interactive-agent" data-agent-id="${agent.id}" transform="translate(${x}, ${y})">
+      <g class="interactive-agent is-working" data-agent-id="${agent.id}" transform="translate(${x}, ${y})">
         <ellipse class="selection-ring" cx="0" cy="6" rx="24" ry="12" fill="rgba(217,119,6,0.2)" stroke="#d97706" stroke-width="3"/>
         <ellipse cx="0" cy="6" rx="16" ry="8" fill="rgba(51,38,29,0.22)"/>
 
         <g class="agent-body-bob">
-          <rect x="-7.5" y="-15" width="6.5" height="14" rx="2" fill="${pants}"/>
-          <rect x="1" y="-15" width="6.5" height="14" rx="2" fill="${pants}"/>
-          <rect x="-8.5" y="-2" width="8" height="4" rx="2" fill="${shoes || '#1e293b'}"/>
-          <rect x="0.5" y="-2" width="8" height="4" rx="2" fill="${shoes || '#1e293b'}"/>
+          <g class="leg-left">
+            <rect x="-7.5" y="-15" width="6.5" height="14" rx="2" fill="${pants}"/>
+            <rect x="-8.5" y="-2" width="8" height="4" rx="2" fill="${shoes || '#1e293b'}"/>
+          </g>
+          <g class="leg-right">
+            <rect x="1" y="-15" width="6.5" height="14" rx="2" fill="${pants}"/>
+            <rect x="0.5" y="-2" width="8" height="4" rx="2" fill="${shoes || '#1e293b'}"/>
+          </g>
+
           <rect x="-10.5" y="-33" width="21" height="20" rx="5.5" fill="${shirt}" stroke="rgba(0,0,0,0.18)" stroke-width="1"/>
           <polygon points="-4.5,-33 4.5,-33 0,-26.5" fill="${accent}"/>
-          <rect x="-14" y="-31" width="4" height="14.5" rx="2" fill="${skin}"/>
-          <rect x="10" y="-31" width="4" height="14.5" rx="2" fill="${skin}"/>
+
+          <rect class="arm-left" x="-14" y="-31" width="4" height="14.5" rx="2" fill="${skin}"/>
+          <rect class="arm-right" x="10" y="-31" width="4" height="14.5" rx="2" fill="${skin}"/>
+
           <circle cx="0" cy="-44" r="10.5" fill="${skin}" stroke="rgba(0,0,0,0.14)" stroke-width="1"/>
           <circle cx="-3.8" cy="-42.5" r="1.3" fill="#1e293b"/>
           <circle cx="3.8" cy="-42.5" r="1.3" fill="#1e293b"/>
@@ -334,12 +323,57 @@ window.Studio.OfficeRenderer = (function () {
           ${accessorySVG}
         </g>
 
-        <g transform="translate(0, -67)">
-          <rect x="-36" y="-10" width="72" height="18" rx="9" fill="#fffdf9" stroke="#d4c2a6" stroke-width="1.2"/>
-          <text x="0" y="2.5" text-anchor="middle" font-size="9.5" font-weight="800" fill="#33261d">${agent.name}</text>
+        <!-- Floating Name Tag + Live State Tag -->
+        <g transform="translate(0, -68)">
+          <rect x="-40" y="-11" width="80" height="19" rx="9.5" fill="#fffdf9" stroke="#d4c2a6" stroke-width="1.2"/>
+          <text x="0" y="1.5" text-anchor="middle" font-size="9.5" font-weight="800" fill="#33261d">${agent.name}</text>
+          <text class="agent-state-sub" x="0" y="-15" text-anchor="middle" font-size="8.5" font-weight="800" fill="#447252">WORKING</text>
         </g>
       </g>
     `;
+  }
+
+  // Smoothly update employee position and visual state classes without re-rendering the entire SVG
+  function updateAgentVisuals(agentStates) {
+    const layer = document.getElementById("agents-layer");
+    if (!layer) return;
+
+    // Painter's algorithm: sort characters by Y so foreground characters overlap background characters naturally
+    const sorted = [...agentStates].sort((a, b) => a.x - b.x === 0 ? a.y - b.y : a.y - b.y);
+
+    sorted.forEach((st) => {
+      const el = layer.querySelector(`.interactive-agent[data-agent-id="${st.id}"]`);
+      if (!el) return;
+
+      el.setAttribute("transform", `translate(${st.x.toFixed(1)}, ${st.y.toFixed(1)})`);
+
+      const isMoving = st.state === "WALKING" || st.state === "RETURNING_TO_DESK";
+      const isWorking = st.state === "WORKING";
+      el.classList.toggle("is-walking", isMoving);
+      el.classList.toggle("is-working", isWorking);
+
+      const subLabel = el.querySelector(".agent-state-sub");
+      if (subLabel) {
+        const labelMap = {
+          WORKING: "WORKING",
+          THINKING: "THINKING...",
+          IDLE: "IDLE",
+          WALKING: "WALKING",
+          RETURNING_TO_DESK: "RETURNING",
+          USING_LOUNGE: "LOUNGE BREAK",
+          TAKING_BREAK: "BREAK",
+          IN_MEETING: "MEETING"
+        };
+        subLabel.textContent = labelMap[st.state] || st.state;
+        subLabel.setAttribute(
+          "fill",
+          isMoving ? "#0284c7" : st.state === "USING_LOUNGE" ? "#9333ea" : st.state === "THINKING" ? "#d97706" : "#447252"
+        );
+      }
+
+      // Re-append in Y-sorted order for clean isometric depth occlusion
+      layer.appendChild(el);
+    });
   }
 
   function renderOffice(containerEl, agents, zones) {
@@ -366,7 +400,7 @@ window.Studio.OfficeRenderer = (function () {
           </linearGradient>
         </defs>
 
-        <!-- ================= U-SHAPED FLOOR SLAB & WOODEN DECK ================= -->
+        <!-- U-SHAPED FLOOR SLAB & WOODEN DECK -->
         <polygon points="680,145 1235,435 880,620 755,555 680,595 605,555 480,620 125,435"
           fill="url(#woodPlanks)" stroke="#b08962" stroke-width="2.5"/>
         <polygon points="480,620 680,515 680,725 480,825 260,710 260,505"
@@ -382,13 +416,13 @@ window.Studio.OfficeRenderer = (function () {
         <polygon points="880,825 1100,710 1100,732 880,847" fill="#8f6b47"/>
         <polygon points="1100,505 1235,435 1235,457 1100,527" fill="#8f6b47"/>
 
-        <!-- ================= BACK PERIMETER STUDIO WALLS ================= -->
+        <!-- BACK PERIMETER STUDIO WALLS -->
         <polygon points="125,435 680,145 680,${145 - wallH} 125,${435 - wallH}"
           fill="url(#wallLeftGrad)" stroke="#d4c2a8" stroke-width="2"/>
         <polygon points="680,145 1235,435 1235,${435 - wallH} 680,${145 - wallH}"
           fill="url(#wallRightGrad)" stroke="#d4c2a8" stroke-width="2"/>
 
-        <!-- Large Panoramic Windows Along Back Walls -->
+        <!-- Panoramic Windows -->
         <g>
           <polygon points="390,260 540,182 540,255 390,333" fill="#bae6fd" stroke="#9c7a54" stroke-width="4"/>
           <line x1="465" y1="221" x2="465" y2="294" stroke="#9c7a54" stroke-width="3"/>
@@ -404,7 +438,7 @@ window.Studio.OfficeRenderer = (function () {
           <circle cx="590" cy="177" r="9" fill="#f59e0b"/>
         </g>
 
-        <!-- Meeting Room Presentation Screen & Pinboard (West Wall) -->
+        <!-- Meeting Room Presentation Screen -->
         <g>
           <polygon points="185,365 320,295 320,355 185,425" fill="#1e293b" stroke="#64748b" stroke-width="3"/>
           <polygon points="193,373 312,311 312,347 193,409" fill="#0f172a"/>
@@ -412,7 +446,7 @@ window.Studio.OfficeRenderer = (function () {
           <circle cx="298" cy="332" r="3.5" fill="#fbbf24"/>
         </g>
 
-        <!-- QA & Child Safety Checklist Wall Board (North-East Wall) -->
+        <!-- QA & Child Safety Checklist Wall Board -->
         <g>
           <polygon points="1125,355 1205,397 1205,452 1125,410" fill="#ffffff" stroke="#447252" stroke-width="2.5"/>
           <line x1="1136" y1="376" x2="1190" y2="404" stroke="#22c55e" stroke-width="2"/>
@@ -420,7 +454,7 @@ window.Studio.OfficeRenderer = (function () {
           <line x1="1136" y1="402" x2="1186" y2="428" stroke="#64748b" stroke-width="1.8"/>
         </g>
 
-        <!-- ================= SIX DISTINCT ZONE FLOOR CARPETS ================= -->
+        <!-- SIX DISTINCT ZONE FLOOR CARPETS -->
         <g class="zone-hotspot" data-zone-id="manager">
           <polygon points="${isoDiamond(475, 270, 125, 66)}" fill="rgba(254, 243, 199, 0.78)"/>
         </g>
@@ -431,7 +465,6 @@ window.Studio.OfficeRenderer = (function () {
 
         <g class="zone-hotspot" data-zone-id="lounge">
           <polygon points="${isoDiamond(680, 395, 175, 92)}" fill="rgba(220, 252, 231, 0.76)" stroke="#86efac" stroke-width="1.5"/>
-          <!-- Stepping-Stone Garden Walkways Connecting All Wings -->
           <polygon points="${isoDiamond(560, 345, 18, 9)}" fill="#e7dcc8" stroke="#c8b699" stroke-width="1"/>
           <polygon points="${isoDiamond(605, 368, 18, 9)}" fill="#e7dcc8" stroke="#c8b699" stroke-width="1"/>
           <polygon points="${isoDiamond(560, 445, 18, 9)}" fill="#e7dcc8" stroke="#c8b699" stroke-width="1"/>
@@ -451,26 +484,17 @@ window.Studio.OfficeRenderer = (function () {
           <polygon points="${isoDiamond(895, 625, 175, 92)}" fill="rgba(252, 231, 243, 0.74)"/>
         </g>
 
-        <!-- ================= GROUNDED GLASS PARTITIONS & CLEAR DOORWAYS ================= -->
-        <!-- Manager Suite Glass Enclosure (Wide Doorway Facing Central Atrium) -->
+        <!-- GROUNDED GLASS PARTITIONS & CLEAR DOORWAYS -->
         ${isoWallSegment(350, 270, 435, 315, 68, { isGlass: true, trimColor: "#d97706" })}
         ${isoWallSegment(515, 315, 600, 270, 68, { isGlass: true, trimColor: "#d97706" })}
-
-        <!-- Meeting Room Partition from Developer Wing (With Corridor Opening) -->
         ${isoWallSegment(260, 505, 375, 445, 58, { isGlass: true, trimColor: "#0d9488" })}
-
-        <!-- Developer Wing Glass Partition Facing Central Garden Atrium (Wide Entrance) -->
         ${isoWallSegment(415, 515, 505, 468, 54, { isGlass: true, trimColor: "#2563eb" })}
         ${isoWallSegment(575, 492, 665, 540, 54, { isGlass: true, trimColor: "#2563eb" })}
-
-        <!-- Art & Audio Wing Acoustic Wall Facing Central Garden Atrium (Wide Entrance) -->
         ${isoWallSegment(945, 515, 855, 468, 54, { wallColor: "#fdf2f8", trimColor: "#db2777", topColor: "#fbcfe8" })}
         ${isoWallSegment(785, 492, 695, 540, 54, { wallColor: "#fdf2f8", trimColor: "#db2777", topColor: "#fbcfe8" })}
-
-        <!-- QA Wing Glass Partition (Wide Entrance Facing Atrium) -->
         ${isoWallSegment(925, 415, 1005, 458, 58, { isGlass: true, trimColor: "#7c3aed" })}
 
-        <!-- ================= FURNITURE & PROPS ================= -->
+        <!-- FURNITURE & PROPS -->
         <!-- 1. Manager Suite (Izmi) -->
         ${renderBookshelf(565, 225)}
         ${renderFileCabinet(400, 250)}
@@ -490,18 +514,15 @@ window.Studio.OfficeRenderer = (function () {
           ${renderChair(315, 450, "#0d9488")}
         </g>
 
-        <!-- 3. Redesigned Garden & Cozy Lounge Atrium (Sofas, Coffee Table, Water Fountain, Lanterns & Trees) -->
+        <!-- 3. Garden & Cozy Lounge Atrium -->
         <g class="zone-hotspot" data-zone-id="lounge">
           ${renderAtriumTree(680, 305, 1.02)}
           ${renderAtriumTree(565, 392, 0.9)}
           ${renderAtriumTree(795, 392, 0.9)}
           ${renderGardenLantern(612, 342)}
           ${renderGardenLantern(748, 342)}
-
-          <!-- Serene Stone Water Fountain Feature -->
           ${renderWaterFeature(680, 348)}
 
-          <!-- Cushioned Pastel Lounge Sofas with Throw Pillows -->
           ${isoBox(632, 398, 36, 17, 13, { top: "#fbcfe8", left: "#f472b6", right: "#ec4899" })}
           ${isoBox(619, 389, 10, 19, 24, { top: "#f472b6", left: "#db2777", right: "#ec4899" })}
           <circle cx="634" cy="382" r="4.5" fill="#fef08a"/>
@@ -510,7 +531,6 @@ window.Studio.OfficeRenderer = (function () {
           ${isoBox(741, 444, 10, 19, 24, { top: "#38bdf8", left: "#0369a1", right: "#0284c7" })}
           <circle cx="726" cy="419" r="4.5" fill="#fde68a"/>
 
-          <!-- Wooden Coffee Table with Mugs & Espresso Counter -->
           ${isoBox(680, 424, 24, 13, 8, { top: "#e6c7a1", left: "#b08962", right: "#c8a276" })}
           <ellipse cx="675" cy="414" rx="3.2" ry="1.8" fill="#ffffff" stroke="#d97706" stroke-width="1"/>
           <ellipse cx="686" cy="418" rx="3.2" ry="1.8" fill="#ffffff" stroke="#0d9488" stroke-width="1"/>
@@ -525,8 +545,7 @@ window.Studio.OfficeRenderer = (function () {
         ${renderWorkstation(1030, 422, "qa")}
         ${renderPlant(1155, 445, 0.95)}
 
-        <!-- 5. Developer Wing (Isaac & Hayyan — Well-Spaced with Clear Aisle + System Architecture Board) -->
-        <!-- System Architecture Board on Developer Wing Divider -->
+        <!-- 5. Developer Wing (Isaac & Hayyan) -->
         <g>
           <polygon points="315,615 395,657 395,705 315,663" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
           <circle cx="338" cy="645" r="4" fill="#38bdf8"/>
@@ -540,8 +559,7 @@ window.Studio.OfficeRenderer = (function () {
         ${renderChair(515, 640, "#7c3aed")}
         ${renderPlant(305, 685, 1.0)}
 
-        <!-- 6. Art & Audio Studio Wing (Izzy, Anis, Abang + Creative Display Boards) -->
-        <!-- Creative Art & Color Palette Wall Board -->
+        <!-- 6. Art & Audio Studio Wing (Izzy, Anis, Abang) -->
         <g>
           <polygon points="965,657 1045,615 1045,663 965,705" fill="#fffbeb" stroke="#db2777" stroke-width="2"/>
           <circle cx="990" cy="665" r="5" fill="#f472b6"/>
@@ -558,12 +576,12 @@ window.Studio.OfficeRenderer = (function () {
         ${renderWorkstation(1000, 586, "audio")}
         ${renderPlant(1070, 685, 1.0)}
 
-        <!-- ================= SEVEN AI STUDIO EMPLOYEES ================= -->
+        <!-- SEVEN AI STUDIO EMPLOYEES -->
         <g id="agents-layer">
           ${agents.map(renderAgentCharacter).join("")}
         </g>
 
-        <!-- ================= EXTERIOR NON-OVERLAPPING ZONE PLAQUES ================= -->
+        <!-- EXTERIOR NON-OVERLAPPING ZONE PLAQUES -->
         <g pointer-events="none" font-size="10.5" font-weight="800" fill="#33261d">
           <rect x="415" y="162" width="122" height="20" rx="10" fill="rgba(255,253,249,0.96)" stroke="#f59e0b" stroke-width="1.5"/>
           <text x="476" y="175.5" text-anchor="middle">MANAGER OFFICE</text>
@@ -589,5 +607,5 @@ window.Studio.OfficeRenderer = (function () {
     containerEl.innerHTML = svg;
   }
 
-  return { renderOffice };
+  return { renderOffice, updateAgentVisuals };
 })();
