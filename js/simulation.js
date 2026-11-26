@@ -164,7 +164,6 @@ window.Studio.SimulationEngine = (function () {
   let lastTimestamp = 0;
   let onTickCallback = null;
 
-  // Studio clock in minutes from midnight (starts at 09:15 AM = 555)
   let studioMinutes = 555;
   let dailyStandupTriggered = false;
   let meetingState = { active: false, timer: 0, topic: STANDUP_TOPICS[0] };
@@ -282,7 +281,6 @@ window.Studio.SimulationEngine = (function () {
     meetingState.timer = 16;
     meetingState.topic = STANDUP_TOPICS[Math.floor(Math.random() * STANDUP_TOPICS.length)];
 
-    // Izmi leads the stand-up + 3 teammates join
     const izmi = agentStates.find((s) => s.id === "agent-01");
     const others = agentStates.filter((s) => s.id !== "agent-01");
     const shuffled = [...others].sort(() => Math.random() - 0.5).slice(0, 3);
@@ -308,7 +306,7 @@ window.Studio.SimulationEngine = (function () {
   }
 
   function chooseNextDestination(occupiedNodes) {
-    const isLunchHour = studioMinutes >= 720 && studioMinutes <= 810; // 12:00 PM - 1:30 PM
+    const isLunchHour = studioMinutes >= 720 && studioMinutes <= 810;
     const roll = Math.random();
     let pool = LOUNGE_SPOTS;
     if (!isLunchHour && roll > 0.68) {
@@ -320,14 +318,12 @@ window.Studio.SimulationEngine = (function () {
   }
 
   function stepSimulation(dt) {
-    // Advance Studio Clock (1 real second = 2 studio minutes at 1x)
     studioMinutes += dt * 2.0;
-    if (studioMinutes >= 1080) { // Wrap 06:00 PM back to 09:00 AM next day
+    if (studioMinutes >= 1080) {
       studioMinutes = 540;
       dailyStandupTriggered = false;
     }
 
-    // Scheduled 02:30 PM (870 mins) Daily Stand-Up
     if (!dailyStandupTriggered && studioMinutes >= 870 && studioMinutes < 880) {
       dailyStandupTriggered = true;
       callTeamStandup();
@@ -402,7 +398,6 @@ window.Studio.SimulationEngine = (function () {
       }
     });
 
-    // Soft personal-space repulsion in corridors
     for (let i = 0; i < agentStates.length; i++) {
       for (let j = i + 1; j < agentStates.length; j++) {
         const a = agentStates[i];
