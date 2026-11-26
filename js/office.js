@@ -5,6 +5,21 @@ window.Studio.OfficeRenderer = (function () {
     return `${cx},${cy - ry} ${cx + rx},${cy} ${cx},${cy + ry} ${cx - rx},${cy}`;
   }
 
+  function hexPoints(cx, cy, rx, ry) {
+    return [
+      [cx, cy - ry],            // 0: North
+      [cx + rx, cy - ry * 0.5], // 1: North-East
+      [cx + rx, cy + ry * 0.5], // 2: South-East
+      [cx, cy + ry],            // 3: South
+      [cx - rx, cy + ry * 0.5], // 4: South-West
+      [cx - rx, cy - ry * 0.5]  // 5: North-West
+    ];
+  }
+
+  function hexPolygonStr(cx, cy, rx, ry) {
+    return hexPoints(cx, cy, rx, ry).map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+  }
+
   function isoBox(cx, cy, rx, ry, h, colors) {
     const top = `${cx},${cy - ry - h} ${cx + rx},${cy - h} ${cx},${cy + ry - h} ${cx - rx},${cy - h}`;
     const left = `${cx - rx},${cy - h} ${cx},${cy + ry - h} ${cx},${cy + ry} ${cx - rx},${cy}`;
@@ -354,7 +369,6 @@ window.Studio.OfficeRenderer = (function () {
     lastSortKey = "";
     Object.keys(agentDomCache).forEach((k) => delete agentDomCache[k]);
 
-    // Unified Single-Foundation Corporate Headquarters Geometry
     const RX = 186;
     const RY = 148;
     const CELLS = {
@@ -404,10 +418,8 @@ window.Studio.OfficeRenderer = (function () {
             const p = pts[zoneId];
             return `
               <g class="zone-hotspot" data-zone-id="${zoneId}">
-                <!-- Architectural Concrete Slab Thickness -->
                 <polygon points="${p[2][0]},${p[2][1]} ${p[3][0]},${p[3][1]} ${p[3][0]},${p[3][1] + 16} ${p[2][0]},${p[2][1] + 16}" fill="#94a3b8"/>
                 <polygon points="${p[3][0]},${p[3][1]} ${p[4][0]},${p[4][1]} ${p[4][0]},${p[4][1] + 16} ${p[3][0]},${p[3][1] + 16}" fill="#cbd5e1"/>
-                <!-- Polished Stone Walkway Perimeter + Warm Oak Interior -->
                 <polygon points="${poly}" fill="url(#polishedConcrete)" stroke="#cbd5e1" stroke-width="1.5"/>
                 <polygon points="${oakInset}" fill="${zoneId === 'lounge' ? 'url(#polishedConcrete)' : 'url(#scandiOak)'}" stroke="#d6cfc2" stroke-width="1"/>
               </g>
@@ -416,13 +428,11 @@ window.Studio.OfficeRenderer = (function () {
         </g>
 
         <!-- OUTER PERIMETER ARCHITECTURAL WALLS -->
-        <!-- Manager Office North Walls + Panoramic Window -->
         ${archWall(pts.manager[5][0], pts.manager[5][1], pts.manager[0][0], pts.manager[0][1], outerWallH)}
         ${archWall(pts.manager[0][0], pts.manager[0][1], pts.manager[1][0], pts.manager[1][1], outerWallH)}
         <polygon points="545,94 635,49 635,92 545,137" fill="#dceef8" stroke="#64748b" stroke-width="2.5"/>
         <line x1="590" y1="71" x2="590" y2="114" stroke="#64748b" stroke-width="1.8"/>
 
-        <!-- Meeting Room North-West Walls + Wall-Mounted Presentation Display -->
         ${archWall(pts.meeting[5][0], pts.meeting[5][1], pts.meeting[0][0], pts.meeting[0][1], outerWallH)}
         ${archWall(pts.meeting[0][0], pts.meeting[0][1], pts.meeting[1][0], pts.meeting[1][1], outerWallH)}
         <polygon points="260,242 355,194 355,236 260,284" fill="#1e293b" stroke="#475569" stroke-width="2.5"/>
@@ -433,7 +443,6 @@ window.Studio.OfficeRenderer = (function () {
           <polygon points="284,247 335,221 335,228 284,254" fill="#38bdf8"/>
         </g>
 
-        <!-- QA Testing North-East Walls + Glass Whiteboard -->
         ${archWall(pts.qa[5][0], pts.qa[5][1], pts.qa[0][0], pts.qa[0][1], outerWallH)}
         ${archWall(pts.qa[0][0], pts.qa[0][1], pts.qa[1][0], pts.qa[1][1], outerWallH)}
         <polygon points="1005,194 1100,242 1100,284 1005,236" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
@@ -448,7 +457,6 @@ window.Studio.OfficeRenderer = (function () {
         ${archDoorWall(pts.lounge[3][0], pts.lounge[3][1], pts.lounge[4][0], pts.lounge[4][1], 16, { isGlass: false, trimColor: "#94a3b8" }, 0.42)}
         ${archDoorWall(pts.lounge[2][0], pts.lounge[2][1], pts.lounge[3][0], pts.lounge[3][1], 16, { isGlass: false, trimColor: "#94a3b8" }, 0.42)}
 
-        <!-- Acoustic / Glass Wing Dividers -->
         ${archWall(pts.meeting[3][0], pts.meeting[3][1], pts.meeting[2][0], pts.meeting[2][1], 24, { isGlass: true })}
         ${archWall(pts.qa[4][0], pts.qa[4][1], pts.qa[3][0], pts.qa[3][1], 24, { isGlass: true })}
 
@@ -480,7 +488,6 @@ window.Studio.OfficeRenderer = (function () {
           ${renderPlanter(680, 378, 0.92, true)}
           ${renderPlanter(575, 455, 0.84, true)}
           ${renderPlanter(785, 455, 0.84, true)}
-          <!-- Warm-Grey Scandinavian Lounge Sofas & Oak Coffee Table -->
           <g class="depth-prop" data-sort-y="445">
             ${isoBox(635, 445, 32, 15, 11, { top: "#cbd5e1", left: "#94a3b8", right: "#b0bec5" })}
           </g>
@@ -490,7 +497,6 @@ window.Studio.OfficeRenderer = (function () {
           <g class="depth-prop" data-sort-y="486">
             ${isoBox(725, 486, 32, 15, 11, { top: "#cbd5e1", left: "#94a3b8", right: "#b0bec5" })}
           </g>
-          <!-- Espresso Bar Counter -->
           <g class="depth-prop" data-sort-y="524">
             ${isoBox(680, 524, 22, 11, 16, { top: "#f8fafc", left: "#cbd5e1", right: "#e2e8f0" })}
             ${isoBox(680, 511, 8, 5, 9, { top: "#334155", left: "#0f172a", right: "#1e293b" })}
