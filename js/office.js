@@ -344,7 +344,6 @@ window.Studio.OfficeRenderer = (function () {
     const layer = document.getElementById("agents-layer");
     if (!layer) return;
 
-    // Update Meeting Room screen status indicator
     const screenPulse = document.getElementById("meeting-screen-active");
     if (screenPulse) {
       screenPulse.setAttribute("opacity", meetingInfo && meetingInfo.active ? "1" : "0");
