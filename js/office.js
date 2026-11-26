@@ -340,6 +340,9 @@ window.Studio.OfficeRenderer = (function () {
     `;
   }
 
+  let lastSortKey = "";
+  const agentDomCache = {};
+
   function updateAgentVisuals(agentStates, meetingInfo) {
     const layer = document.getElementById("agents-layer");
     if (!layer) return;
@@ -350,10 +353,23 @@ window.Studio.OfficeRenderer = (function () {
     }
 
     const sorted = [...agentStates].sort((a, b) => a.y - b.y);
+    const sortKey = sorted.map((s) => s.id).join(",");
+    const orderChanged = sortKey !== lastSortKey;
 
     sorted.forEach((st) => {
-      const el = layer.querySelector(`.interactive-agent[data-agent-id="${st.id}"]`);
-      if (!el) return;
+      let cached = agentDomCache[st.id];
+      if (!cached || !cached.el.isConnected) {
+        const el = layer.querySelector(`.interactive-agent[data-agent-id="${st.id}"]`);
+        if (!el) return;
+        cached = agentDomCache[st.id] = {
+          el,
+          subLabel: el.querySelector(".agent-state-sub"),
+          bubble: el.querySelector(".agent-speech-bubble"),
+          bubbleText: el.querySelector(".bubble-text"),
+          bubbleBg: el.querySelector(".bubble-bg")
+        };
+      }
+      const { el, subLabel, bubble, bubbleText, bubbleBg } = cached;
 
       el.setAttribute("transform", `translate(${st.x.toFixed(1)}, ${st.y.toFixed(1)})`);
 
@@ -362,7 +378,6 @@ window.Studio.OfficeRenderer = (function () {
       el.classList.toggle("is-walking", isMoving);
       el.classList.toggle("is-working", isWorking);
 
-      const subLabel = el.querySelector(".agent-state-sub");
       if (subLabel) {
         const labelMap = {
           WORKING: "WORKING",
@@ -381,9 +396,6 @@ window.Studio.OfficeRenderer = (function () {
         );
       }
 
-      const bubble = el.querySelector(".agent-speech-bubble");
-      const bubbleText = el.querySelector(".bubble-text");
-      const bubbleBg = el.querySelector(".bubble-bg");
       if (bubble && bubbleText) {
         if (st.speechText && st.speechTimer > 0) {
           bubbleText.textContent = st.speechText;
@@ -398,11 +410,20 @@ window.Studio.OfficeRenderer = (function () {
         }
       }
 
-      layer.appendChild(el);
+      if (orderChanged) {
+        layer.appendChild(el);
+      }
     });
+
+    if (orderChanged) {
+      lastSortKey = sortKey;
+    }
   }
 
   function renderOffice(containerEl, agents, zones) {
+    lastSortKey = "";
+    Object.keys(agentDomCache).forEach((k) => delete agentDomCache[k]);
+
     const wallH = 115;
 
     const svg = `
