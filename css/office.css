@@ -4,7 +4,7 @@
   flex: 1;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 50% 45%, #fcf7ee 0%, #e7d7be 100%);
+  background: radial-gradient(circle at 50% 42%, #faf8f4 0%, #e6e0d5 100%);
   overflow: hidden;
   cursor: grab;
   user-select: none;
@@ -12,7 +12,7 @@
 }
 
 .iso-viewport.evening-mood {
-  background: radial-gradient(circle at 50% 45%, #f3dec8 0%, #cfb396 100%);
+  background: radial-gradient(circle at 50% 42%, #ede5d8 0%, #cfc4b2 100%);
 }
 
 .iso-viewport:active {
@@ -65,8 +65,8 @@
 }
 
 @keyframes pulseRing {
-  0%, 100% { stroke-opacity: 0.95; stroke-width: 3; }
-  50% { stroke-opacity: 0.35; stroke-width: 5.5; }
+  0%, 100% { stroke-opacity: 0.9; stroke-width: 2.5; }
+  50% { stroke-opacity: 0.3; stroke-width: 4.5; }
 }
 
 .zone-hotspot {
@@ -75,7 +75,7 @@
 }
 
 .zone-hotspot:hover {
-  opacity: 0.94;
+  opacity: 0.95;
 }
 
 /* Speech Bubbles */
@@ -147,16 +147,16 @@
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 253, 249, 0.92);
+  background: rgba(252, 251, 248, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1.5px solid var(--border-wood);
+  border: 1px solid var(--border-wood);
   border-radius: 999px;
   padding: 5px 10px;
   display: flex;
   align-items: center;
   gap: 5px;
-  box-shadow: 0 6px 18px rgba(51, 38, 29, 0.12);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
   z-index: 15;
   max-width: 94vw;
   overflow-x: auto;
@@ -188,7 +188,7 @@
 }
 
 .zone-pill.active {
-  background: var(--accent-amber);
+  background: #334155;
   color: #ffffff;
 }
 
@@ -196,7 +196,7 @@
   position: absolute;
   bottom: 12px;
   left: 16px;
-  background: rgba(255, 253, 249, 0.92);
+  background: rgba(252, 251, 248, 0.92);
   border: 1px solid var(--border-wood);
   border-radius: 999px;
   padding: 6px 14px;
@@ -222,7 +222,7 @@
 }
 
 .status-dot.paused {
-  background: #f59e0b;
+  background: #64748b;
 }
 
 /* Slide-Out Inspector Drawer */
@@ -234,7 +234,7 @@
   width: 350px;
   max-width: calc(100vw - 28px);
   background: var(--bg-warm-panel);
-  border: 2px solid var(--border-wood);
+  border: 1.5px solid var(--border-wood);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-cozy);
   z-index: 25;
@@ -253,8 +253,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 18px;
-  border-bottom: 1.5px solid var(--border-wood);
-  background: var(--bg-cream);
+  border-bottom: 1px solid var(--border-wood);
+  background: #f4f1ea;
   border-radius: 14px 14px 0 0;
 }
 
@@ -262,7 +262,7 @@
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.6px;
-  color: var(--accent-amber);
+  color: #475569;
 }
 
 .close-btn {
@@ -313,8 +313,8 @@
 }
 
 .live-telemetry-card {
-  background: var(--bg-cream);
-  border: 1.5px solid var(--border-wood);
+  background: #f4f1ea;
+  border: 1px solid var(--border-wood);
   border-radius: 12px;
   padding: 12px;
   display: flex;
@@ -338,7 +338,7 @@
 .drawer-action-btn {
   flex: 1;
   background: var(--bg-warm-panel);
-  border: 1.5px solid var(--border-wood);
+  border: 1px solid var(--border-wood);
   border-radius: 8px;
   padding: 6px 8px;
   font-size: 11.5px;
@@ -353,11 +353,11 @@
 }
 
 .phase-notice {
-  background: var(--accent-amber-soft);
-  border: 1px solid #f59e0b;
+  background: #f1ede4;
+  border: 1px solid var(--border-wood);
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 12px;
-  color: #78350f;
+  color: #475569;
   line-height: 1.4;
 }
