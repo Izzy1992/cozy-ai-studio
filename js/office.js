@@ -43,38 +43,38 @@ window.Studio.OfficeRenderer = (function () {
     const dx = x2 - x1;
     const dy = y2 - y1;
     const len = Math.hypot(dx, dy) || 1;
-    const nx = (-dy / len) * 4;
-    const ny = (dx / len) * 2.1;
+    const nx = (-dy / len) * 3.8;
+    const ny = (dx / len) * 2.0;
 
-    const faceFill = isGlass ? "rgba(219, 238, 248, 0.28)" : wallColor;
-    const faceStroke = isGlass ? "rgba(71, 85, 105, 0.55)" : "#cfc8bc";
+    const faceFill = isGlass ? "rgba(219, 238, 248, 0.24)" : wallColor;
+    const faceStroke = isGlass ? "rgba(100, 116, 139, 0.45)" : "#cfc8bc";
 
     let glassDetail = "";
     if (isGlass) {
       const mx = (x1 + x2) / 2;
       const my = (y1 + y2) / 2;
       glassDetail = `
-        <line x1="${mx}" y1="${my}" x2="${mx}" y2="${my - h}" stroke="rgba(71,85,105,0.45)" stroke-width="1.4"/>
-        <line x1="${x1}" y1="${y1 - h * 0.45}" x2="${x2}" y2="${y2 - h * 0.45}" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+        <line x1="${mx}" y1="${my}" x2="${mx}" y2="${my - h}" stroke="rgba(100,116,139,0.38)" stroke-width="1.2"/>
+        <line x1="${x1}" y1="${y1 - h * 0.5}" x2="${x2}" y2="${y2 - h * 0.5}" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
       `;
     }
 
     return `
       <g>
         <polygon points="${x1},${y1} ${x2},${y2} ${x2},${y2 - h} ${x1},${y1 - h}"
-          fill="${faceFill}" stroke="${faceStroke}" stroke-width="1.2"/>
-        <polygon points="${x1},${y1} ${x2},${y2} ${x2},${y2 - 6} ${x1},${y1 - 6}" fill="${trimColor}"/>
+          fill="${faceFill}" stroke="${faceStroke}" stroke-width="1.1"/>
+        <polygon points="${x1},${y1} ${x2},${y2} ${x2},${y2 - 5} ${x1},${y1 - 5}" fill="${trimColor}"/>
         ${glassDetail}
         <polygon points="${x1},${y1 - h} ${x2},${y2 - h} ${x2 + nx},${y2 + ny - h} ${x1 + nx},${y1 + ny - h}"
-          fill="${isGlass ? '#334155' : topColor}" stroke="${isGlass ? '#1e293b' : '#c7bfb2'}" stroke-width="0.9"/>
-        ${isoBox(x1, y1, 2.6, 1.5, h + 1, { top: "#334155", left: "#1e293b", right: "#475569" })}
-        ${isoBox(x2, y2, 2.6, 1.5, h + 1, { top: "#334155", left: "#1e293b", right: "#475569" })}
+          fill="${isGlass ? '#475569' : topColor}" stroke="${isGlass ? '#334155' : '#c7bfb2'}" stroke-width="0.9"/>
+        ${isoBox(x1, y1, 2.4, 1.4, h + 1, { top: "#475569", left: "#1e293b", right: "#64748b" })}
+        ${isoBox(x2, y2, 2.4, 1.4, h + 1, { top: "#475569", left: "#1e293b", right: "#64748b" })}
       </g>
     `;
   }
 
   // Partition wall with a clean architectural doorway opening
-  function archDoorWall(x1, y1, x2, y2, h, options = {}, gapRatio = 0.34) {
+  function archDoorWall(x1, y1, x2, y2, h, options = {}, gapRatio = 0.38) {
     const t1 = (1 - gapRatio) * 0.5;
     const t2 = 1 - t1;
     const dx1 = x1 + (x2 - x1) * t1;
@@ -83,7 +83,7 @@ window.Studio.OfficeRenderer = (function () {
     const dy2 = y1 + (y2 - y1) * t2;
 
     return `
-      <line x1="${dx1}" y1="${dy1}" x2="${dx2}" y2="${dy2}" stroke="#94a3b8" stroke-width="2" opacity="0.6"/>
+      <line x1="${dx1}" y1="${dy1}" x2="${dx2}" y2="${dy2}" stroke="#94a3b8" stroke-width="2" opacity="0.55"/>
       ${archWall(x1, y1, dx1, dy1, h, options)}
       ${archWall(dx2, dy2, x2, y2, h, options)}
     `;
@@ -231,32 +231,48 @@ window.Studio.OfficeRenderer = (function () {
     }
 
     return `
-      <g class="interactive-agent is-working" data-agent-id="${agent.id}" data-sort-y="${y}" transform="translate(${x}, ${y})">
+      <g class="interactive-agent is-working is-seated" data-agent-id="${agent.id}" data-sort-y="${y}" transform="translate(${x}, ${y})">
         <ellipse class="selection-ring" cx="0" cy="5" rx="20" ry="10" fill="rgba(15,23,42,0.12)" stroke="#334155" stroke-width="2.5"/>
         <ellipse cx="0" cy="5" rx="14" ry="7" fill="rgba(15,23,42,0.18)"/>
 
-        <g class="agent-body-bob">
-          <g class="leg-left">
-            <rect x="-7" y="-14" width="6" height="13" rx="2" fill="${pants}"/>
-            <rect x="-8" y="-2" width="7.5" height="3.8" rx="1.8" fill="${shoes || '#1e293b'}"/>
+        <!-- Directional Flip Container (Body only; keeps text tags readable) -->
+        <g class="agent-flip-wrap">
+          <g class="agent-body-bob">
+            <!-- Standing Legs -->
+            <g class="legs-standing">
+              <g class="leg-left">
+                <rect x="-7" y="-14" width="6" height="13" rx="2" fill="${pants}"/>
+                <rect x="-8" y="-2" width="7.5" height="3.8" rx="1.8" fill="${shoes || '#1e293b'}"/>
+              </g>
+              <g class="leg-right">
+                <rect x="1" y="-14" width="6" height="13" rx="2" fill="${pants}"/>
+                <rect x="0.5" y="-2" width="7.5" height="3.8" rx="1.8" fill="${shoes || '#1e293b'}"/>
+              </g>
+            </g>
+
+            <!-- Seated Posture Legs (Knees bent forward over chair edge) -->
+            <g class="legs-seated">
+              <polygon points="-7,-15 3,-11 -2,-5 -11,-9" fill="${pants}"/>
+              <rect x="-11" y="-9" width="5.5" height="9" rx="2" fill="${pants}"/>
+              <rect x="-13" y="-1.5" width="7" height="3.5" rx="1.5" fill="${shoes || '#1e293b'}"/>
+              <polygon points="0,-13 9,-9 4,-3 -5,-7" fill="${pants}"/>
+              <rect x="-4" y="-7" width="5.5" height="9" rx="2" fill="${pants}"/>
+              <rect x="-6" y="0.5" width="7" height="3.5" rx="1.5" fill="${shoes || '#1e293b'}"/>
+            </g>
+
+            <rect x="-10" y="-32" width="20" height="19" rx="5" fill="${shirt}" stroke="rgba(15,23,42,0.16)" stroke-width="0.9"/>
+            <polygon points="-4,-32 4,-32 0,-26" fill="${accent}"/>
+
+            <rect class="arm-left" x="-13.2" y="-30" width="3.8" height="14" rx="1.9" fill="${skin}"/>
+            <rect class="arm-right" x="9.4" y="-30" width="3.8" height="14" rx="1.9" fill="${skin}"/>
+
+            <circle cx="0" cy="-42.5" r="10" fill="${skin}" stroke="rgba(15,23,42,0.12)" stroke-width="0.9"/>
+            <circle cx="-3.6" cy="-41" r="1.2" fill="#1e293b"/>
+            <circle cx="3.6" cy="-41" r="1.2" fill="#1e293b"/>
+            <path d="M-2.2,-37.8 Q0,-36 2.2,-37.8" fill="none" stroke="#7c2d12" stroke-width="1.1" stroke-linecap="round"/>
+            ${hairPath}
+            ${accessorySVG}
           </g>
-          <g class="leg-right">
-            <rect x="1" y="-14" width="6" height="13" rx="2" fill="${pants}"/>
-            <rect x="0.5" y="-2" width="7.5" height="3.8" rx="1.8" fill="${shoes || '#1e293b'}"/>
-          </g>
-
-          <rect x="-10" y="-32" width="20" height="19" rx="5" fill="${shirt}" stroke="rgba(15,23,42,0.16)" stroke-width="0.9"/>
-          <polygon points="-4,-32 4,-32 0,-26" fill="${accent}"/>
-
-          <rect class="arm-left" x="-13.2" y="-30" width="3.8" height="14" rx="1.9" fill="${skin}"/>
-          <rect class="arm-right" x="9.4" y="-30" width="3.8" height="14" rx="1.9" fill="${skin}"/>
-
-          <circle cx="0" cy="-42.5" r="10" fill="${skin}" stroke="rgba(15,23,42,0.12)" stroke-width="0.9"/>
-          <circle cx="-3.6" cy="-41" r="1.2" fill="#1e293b"/>
-          <circle cx="3.6" cy="-41" r="1.2" fill="#1e293b"/>
-          <path d="M-2.2,-37.8 Q0,-36 2.2,-37.8" fill="none" stroke="#7c2d12" stroke-width="1.1" stroke-linecap="round"/>
-          ${hairPath}
-          ${accessorySVG}
         </g>
 
         <!-- Minimal Architectural Name Pill -->
@@ -307,6 +323,7 @@ window.Studio.OfficeRenderer = (function () {
         if (!el) return;
         cached = agentDomCache[st.id] = {
           el,
+          prevX: st.x,
           subLabel: el.querySelector(".agent-state-sub"),
           bubble: el.querySelector(".agent-speech-bubble"),
           bubbleText: el.querySelector(".bubble-text"),
@@ -315,13 +332,26 @@ window.Studio.OfficeRenderer = (function () {
       }
       const { el, subLabel, bubble, bubbleText, bubbleBg } = cached;
 
+      // Update directional facing based on horizontal movement or desk orientation
+      const dx = st.x - cached.prevX;
+      if (Math.abs(dx) > 0.15) {
+        el.classList.toggle("facing-left", dx < 0);
+      } else if (st.state === "WORKING") {
+        // Face toward workstation monitor when seated at desk
+        el.classList.toggle("facing-left", st.x > 680);
+      }
+      cached.prevX = st.x;
+
       el.setAttribute("transform", `translate(${st.x.toFixed(1)}, ${st.y.toFixed(1)})`);
       el.dataset.sortY = st.y.toFixed(1);
 
       const isMoving = st.state === "WALKING" || st.state === "RETURNING_TO_DESK" || st.state === "PEER_REVIEW";
       const isWorking = st.state === "WORKING";
+      const isSeated = isWorking || st.state === "THINKING" || st.state === "IN_MEETING";
+
       el.classList.toggle("is-walking", isMoving);
       el.classList.toggle("is-working", isWorking);
+      el.classList.toggle("is-seated", isSeated);
 
       if (subLabel) {
         const labelMap = {
@@ -385,11 +415,15 @@ window.Studio.OfficeRenderer = (function () {
       pts[k] = hexPoints(CELLS[k].cx, CELLS[k].cy, RX, RY);
     });
 
+    // South Courtyard Terrace cell completing the bottom honeycomb notch
+    const southPts = hexPoints(680, 756, RX, RY);
+    const southPoly = hexPolygonStr(680, 756, RX, RY);
+
     const outerWallH = 76;
-    const glassPartitionH = 44;
+    const glassBalustradeH = 26; // Sleek half-glass partitions for unobstructed sightlines
 
     const svg = `
-      <svg class="office-svg" viewBox="140 -25 1080 860" xmlns="http://www.w3.org/2000/svg">
+      <svg class="office-svg" viewBox="140 -25 1080 945" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="buildingAmbientShadow" x="-10%" y="-10%" width="120%" height="125%">
             <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#1e293b" flood-opacity="0.18"/>
@@ -425,6 +459,14 @@ window.Studio.OfficeRenderer = (function () {
               </g>
             `;
           }).join("")}
+
+          <!-- South Courtyard Terrace (Completes bottom honeycomb symmetry) -->
+          <g class="zone-hotspot" data-zone-id="lounge">
+            <polygon points="${southPts[2][0]},${southPts[2][1]} ${southPts[3][0]},${southPts[3][1]} ${southPts[3][0]},${southPts[3][1] + 16} ${southPts[2][0]},${southPts[2][1] + 16}" fill="#94a3b8"/>
+            <polygon points="${southPts[3][0]},${southPts[3][1]} ${southPts[4][0]},${southPts[4][1]} ${southPts[4][0]},${southPts[4][1] + 16} ${southPts[3][0]},${southPts[3][1] + 16}" fill="#cbd5e1"/>
+            <polygon points="${southPoly}" fill="url(#polishedConcrete)" stroke="#cbd5e1" stroke-width="1.5"/>
+            <polygon points="${hexPolygonStr(680, 756, RX * 0.84, RY * 0.84)}" fill="#e3ede6" stroke="#c3d4c8" stroke-width="1"/>
+          </g>
         </g>
 
         <!-- OUTER PERIMETER ARCHITECTURAL WALLS -->
@@ -449,16 +491,16 @@ window.Studio.OfficeRenderer = (function () {
         <line x1="1018" y1="212" x2="1085" y2="245" stroke="#0ea5e9" stroke-width="1.8"/>
         <line x1="1018" y1="224" x2="1075" y2="252" stroke="#64748b" stroke-width="1.6"/>
 
-        <!-- TEMPERED GLASS PARTITIONS WITH CLEAN ENTRANCES -->
-        ${archDoorWall(pts.lounge[5][0], pts.lounge[5][1], pts.lounge[0][0], pts.lounge[0][1], glassPartitionH, { isGlass: true }, 0.38)}
-        ${archDoorWall(pts.lounge[0][0], pts.lounge[0][1], pts.lounge[1][0], pts.lounge[1][1], glassPartitionH, { isGlass: true }, 0.38)}
-        ${archDoorWall(pts.lounge[4][0], pts.lounge[4][1], pts.lounge[5][0], pts.lounge[5][1], glassPartitionH, { isGlass: true }, 0.40)}
-        ${archDoorWall(pts.lounge[1][0], pts.lounge[1][1], pts.lounge[2][0], pts.lounge[2][1], glassPartitionH, { isGlass: true }, 0.40)}
-        ${archDoorWall(pts.lounge[3][0], pts.lounge[3][1], pts.lounge[4][0], pts.lounge[4][1], 16, { isGlass: false, trimColor: "#94a3b8" }, 0.42)}
-        ${archDoorWall(pts.lounge[2][0], pts.lounge[2][1], pts.lounge[3][0], pts.lounge[3][1], 16, { isGlass: false, trimColor: "#94a3b8" }, 0.42)}
+        <!-- SLEEK 26px HALF-GLASS PARTITIONS WITH CLEAN ENTRANCES -->
+        ${archDoorWall(pts.lounge[5][0], pts.lounge[5][1], pts.lounge[0][0], pts.lounge[0][1], glassBalustradeH, { isGlass: true }, 0.38)}
+        ${archDoorWall(pts.lounge[0][0], pts.lounge[0][1], pts.lounge[1][0], pts.lounge[1][1], glassBalustradeH, { isGlass: true }, 0.38)}
+        ${archDoorWall(pts.lounge[4][0], pts.lounge[4][1], pts.lounge[5][0], pts.lounge[5][1], glassBalustradeH, { isGlass: true }, 0.40)}
+        ${archDoorWall(pts.lounge[1][0], pts.lounge[1][1], pts.lounge[2][0], pts.lounge[2][1], glassBalustradeH, { isGlass: true }, 0.40)}
+        ${archDoorWall(pts.lounge[3][0], pts.lounge[3][1], pts.lounge[4][0], pts.lounge[4][1], 14, { isGlass: false, trimColor: "#94a3b8" }, 0.42)}
+        ${archDoorWall(pts.lounge[2][0], pts.lounge[2][1], pts.lounge[3][0], pts.lounge[3][1], 14, { isGlass: false, trimColor: "#94a3b8" }, 0.42)}
 
-        ${archWall(pts.meeting[3][0], pts.meeting[3][1], pts.meeting[2][0], pts.meeting[2][1], 24, { isGlass: true })}
-        ${archWall(pts.qa[4][0], pts.qa[4][1], pts.qa[3][0], pts.qa[3][1], 24, { isGlass: true })}
+        ${archWall(pts.meeting[3][0], pts.meeting[3][1], pts.meeting[2][0], pts.meeting[2][1], 20, { isGlass: true })}
+        ${archWall(pts.qa[4][0], pts.qa[4][1], pts.qa[3][0], pts.qa[3][1], 20, { isGlass: true })}
 
         <!-- UNIFIED Y-DEPTH SORTED FURNITURE, PLANTERS & 7 EMPLOYEES -->
         <g id="depth-sorted-layer">
@@ -502,6 +544,13 @@ window.Studio.OfficeRenderer = (function () {
             ${isoBox(680, 511, 8, 5, 9, { top: "#334155", left: "#0f172a", right: "#1e293b" })}
           </g>
 
+          <!-- South Courtyard Terrace Planters & Bench -->
+          ${renderPlanter(610, 745, 0.85, true)}
+          ${renderPlanter(750, 745, 0.85, true)}
+          <g class="depth-prop" data-sort-y="756">
+            ${isoBox(680, 756, 38, 16, 8, { top: "#d8be9c", left: "#b89c78", right: "#cbb08c" })}
+          </g>
+
           <!-- 4. QA Testing Lab -->
           ${renderBookshelf(1045, 292)}
           ${renderErgonomicChair(975, 305, "#334155")}
@@ -533,8 +582,9 @@ window.Studio.OfficeRenderer = (function () {
         ${renderArchSign(272, 376, "MEETING ROOM", "#0d9488")}
         ${renderArchSign(680, 332, "GARDEN LOUNGE", "#447252")}
         ${renderArchSign(1086, 376, "QA TESTING", "#7c3aed")}
-        ${renderArchSign(401, 756, "DEVELOPER WING", "#2563eb")}
-        ${renderArchSign(959, 756, "ART & AUDIO", "#db2777")}
+        ${renderArchSign(310, 712, "DEVELOPER WING", "#2563eb")}
+        ${renderArchSign(1050, 712, "ART & AUDIO", "#db2777")}
+        ${renderArchSign(680, 868, "SOUTH COURTYARD", "#447252")}
       </svg>
     `;
 
