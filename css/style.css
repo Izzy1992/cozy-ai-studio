@@ -113,6 +113,31 @@ html, body {
   box-shadow: 0 2px 6px rgba(51, 38, 29, 0.12);
 }
 
+/* Studio Day Clock Pill */
+.studio-clock-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--accent-amber-soft);
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 4px 10px;
+}
+
+.clock-time {
+  font-size: 12px;
+  font-weight: 800;
+  color: #78350f;
+}
+
+.clock-phase {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b45309;
+  border-left: 1px solid rgba(180, 83, 9, 0.3);
+  padding-left: 7px;
+}
+
 /* Simulation & Viewport Controls */
 .viewport-controls {
   display: flex;
@@ -156,6 +181,18 @@ html, body {
 .sim-btn.primary.paused {
   background: var(--accent-amber);
   border-color: #b45309;
+}
+
+.sim-btn.meeting-trigger {
+  background: #ccfbf1;
+  color: #0f766e;
+  border-color: #5eead4;
+}
+
+.sim-btn.meeting-trigger.active {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0f766e;
 }
 
 .sim-select {
@@ -373,15 +410,15 @@ html, body {
 .state-WORKING { background: #dbeafe; color: #1d4ed8; }
 .state-THINKING { background: #fef3c7; color: #b45309; }
 .state-IDLE { background: #f1f5f9; color: #475569; }
-.state-WALKING, .state-RETURNING_TO_DESK { background: #dcfce7; color: #15803d; }
+.state-WALKING, .state-RETURNING_TO_DESK, .state-PEER_REVIEW { background: #dcfce7; color: #15803d; }
 .state-USING_LOUNGE, .state-TAKING_BREAK { background: #fae8ff; color: #86198f; }
 .state-IN_MEETING { background: #ccfbf1; color: #0f766e; }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .studio-topbar {
     padding: 8px 12px;
   }
-  .studio-subtitle, .canvas-hint {
+  .studio-subtitle, .canvas-hint, .clock-phase {
     display: none;
   }
   .nav-btn {
