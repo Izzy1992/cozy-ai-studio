@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sunbeam Indie Studio — Phase 2.1 &amp; 2.2: Employee Simulation &amp; Pathfinding</title>
+  <title>Sunbeam Indie Studio — Phase 2.3 &amp; 2.4: Autonomous Routines &amp; Meetings</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/office.css" />
 </head>
@@ -21,7 +21,7 @@
         </div>
         <div>
           <h1 class="studio-title">Sunbeam Indie Studio</h1>
-          <span class="studio-subtitle">Phase 2.1 &amp; 2.2 &bull; State Machines &amp; Pathfinding</span>
+          <span class="studio-subtitle">Phase 2.3 &amp; 2.4 &bull; Routines, Dialogue &amp; Stand-Ups</span>
         </div>
       </div>
 
@@ -35,6 +35,11 @@
 
       <!-- Simulation & Camera Controls -->
       <div class="viewport-controls">
+        <div class="studio-clock-pill" title="Simulated Studio Schedule">
+          <span id="studio-time-readout" class="clock-time">09:15 AM</span>
+          <span id="studio-phase-readout" class="clock-phase">Morning Sprint</span>
+        </div>
+
         <div class="sim-controls" role="group" aria-label="Simulation Controls">
           <button class="sim-btn primary" id="btn-sim-toggle" title="Pause or Resume Employee Simulation">Pause</button>
           <select id="sim-speed-select" class="sim-select" title="Simulation Speed">
@@ -43,7 +48,8 @@
             <option value="2">2x</option>
             <option value="3">3x</option>
           </select>
-          <button class="sim-btn" id="btn-sim-reset" title="Return All Employees to Desks">Reset Sim</button>
+          <button class="sim-btn meeting-trigger" id="btn-call-meeting" title="Gather Team in Meeting Room">Call Stand-Up</button>
+          <button class="sim-btn" id="btn-sim-reset" title="Return All Employees to Desks">Reset</button>
         </div>
 
         <button class="icon-btn" id="btn-zoom-out" title="Zoom Out">&minus;</button>
@@ -55,7 +61,7 @@
 
     <!-- Main Content Area -->
     <main class="studio-workspace">
-      <!-- VIEW 1: ISOMETRIC OFFICE (Primary Attraction) -->
+      <!-- VIEW 1: ISOMETRIC OFFICE -->
       <section id="view-office" class="view-section active">
         <div id="iso-viewport" class="iso-viewport">
           <div id="iso-stage" class="iso-stage">
@@ -77,7 +83,7 @@
           <!-- Floating Helper Tip -->
           <div class="canvas-hint">
             <span id="sim-status-dot" class="status-dot running"></span>
-            <span id="sim-status-text">Simulation Running (1x)</span> &bull; Click any employee to inspect live state &amp; path
+            <span id="sim-status-text">Simulation Running (1x)</span> &bull; Click any employee to inspect live state &amp; dialogue
           </div>
         </div>
 
