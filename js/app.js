@@ -1,5 +1,5 @@
 (function () {
-  const { AGENTS, ZONES, ROADMAP, OfficeRenderer, SimulationEngine } = window.Studio;
+  const { AGENTS, ZONES, ROADMAP, OfficeRenderer, SimulationEngine, KanbanStore } = window.Studio;
 
   const navButtons = document.querySelectorAll(".nav-btn");
   const viewSections = document.querySelectorAll(".view-section");
@@ -29,6 +29,13 @@
   const zonesGrid = document.getElementById("zones-grid");
   const roadmapList = document.getElementById("roadmap-list");
 
+  const kanbanBoardGrid = document.getElementById("kanban-board-grid");
+  const kanbanAddForm = document.getElementById("kanban-add-form");
+  const kanbanTitleInput = document.getElementById("kanban-title-input");
+  const kanbanAssigneeSelect = document.getElementById("kanban-assignee-select");
+  const kanbanPrioritySelect = document.getElementById("kanban-priority-select");
+  const btnResetKanban = document.getElementById("btn-reset-kanban");
+
   let camX = 0;
   let camY = 14;
   let camZoom = 1;
@@ -37,7 +44,6 @@
   let dragStartY = 0;
   let selectedAgentId = null;
 
-  // Cached inspector telemetry elements & HUD throttle state
   let inspectorCache = { agentId: null, badgeEl: null, actEl: null, locEl: null, nextEl: null };
   let lastHudUpdateMs = 0;
   let lastClockText = "";
@@ -68,7 +74,7 @@
 
   SimulationEngine.init(AGENTS, (states, clock) => {
     const now = performance.now();
-    if (now - lastHudUpdateMs < 200) return; // Throttle DOM HUD writes to ~5 Hz
+    if (now - lastHudUpdateMs < 200) return;
     lastHudUpdateMs = now;
 
     if (clock) {
@@ -138,6 +144,7 @@
   function switchView(viewName) {
     navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.view === viewName));
     viewSections.forEach((sec) => sec.classList.toggle("active", sec.id === `view-${viewName}`));
+    if (viewName === "kanban") renderKanbanBoard();
   }
 
   navButtons.forEach((btn) => {
@@ -274,29 +281,29 @@
         </div>
         <div>
           <h3 style="font-size:17px; font-weight:800;">${agent.name}</h3>
-          <div style="font-size:12px; font-weight:700; color:#c4552d;">${agent.title}</div>
+          <div style="font-size:12px; font-weight:700; color:#475569;">${agent.title}</div>
         </div>
       </div>
 
       <div class="live-telemetry-card">
         <div class="telemetry-row">
-          <span style="font-weight:700; color:#756354;">Current State</span>
+          <span style="font-weight:700; color:#64748b;">Current State</span>
           <span id="live-state-badge" class="state-badge state-${st ? st.state : 'WORKING'}">${st ? st.state.replace(/_/g, " ") : "WORKING"}</span>
         </div>
         <div class="telemetry-row">
-          <span style="font-weight:700; color:#756354;">Current Zone</span>
+          <span style="font-weight:700; color:#64748b;">Current Zone</span>
           <strong id="live-location-text">${zone ? zone.name : ""}</strong>
         </div>
         <div style="font-size:12.5px; margin-top:2px;">
-          <span style="font-weight:700; color:#756354;">Activity:</span>
+          <span style="font-weight:700; color:#64748b;">Activity:</span>
           <span id="live-activity-text">${st ? st.currentActivity : ""}</span>
         </div>
-        <div style="font-size:11.5px; color:#756354;">
+        <div style="font-size:11.5px; color:#64748b;">
           <strong>Next State:</strong> <span id="live-next-text">${st ? st.nextIntendedActivity.replace(/_/g, " ") : "THINKING"}</span>
         </div>
         <div class="quick-action-row">
           <button class="drawer-action-btn" id="btn-agent-lounge">Coffee Break</button>
-          <button class="drawer-action-btn" id="btn-agent-standup">Call Stand-Up</button>
+          <button class="drawer-action-btn" id="btn-agent-kanban">View Sprint Board</button>
         </div>
       </div>
 
@@ -323,17 +330,13 @@
           ${agent.responsibilities.map((r) => `<li>${r}</li>`).join("")}
         </ul>
       </div>
-
-      <div class="phase-notice">
-        <strong>Simulated Activity (Phase 2.3 &amp; 2.4):</strong> Weighted Dijkstra pathfinding, doorway queuing, and full day/evening schedules run locally in the browser.
-      </div>
     `;
 
     inspectorCache.agentId = null;
     updateLiveInspectorTelemetry(agent.id);
 
     document.getElementById("btn-agent-lounge").onclick = () => SimulationEngine.sendAgentToLounge(agent.id);
-    document.getElementById("btn-agent-standup").onclick = () => SimulationEngine.callTeamStandup();
+    document.getElementById("btn-agent-kanban").onclick = () => switchView("kanban");
 
     inspectorDrawer.classList.add("open");
   }
@@ -346,7 +349,7 @@
     drawerBody.innerHTML = `
       <div>
         <h3 style="font-size:18px; font-weight:800; margin-bottom:4px;">${zone.name}</h3>
-        <p style="font-size:13px; color:#756354; line-height:1.45;">${zone.description}</p>
+        <p style="font-size:13px; color:#64748b; line-height:1.45;">${zone.description}</p>
       </div>
 
       <div class="inspector-section">
@@ -356,15 +359,95 @@
             ? `<ul class="inspector-list">${zoneAgents
                 .map((a) => `<li><strong>${a.name}</strong> — ${a.title}</li>`)
                 .join("")}</ul>`
-            : `<p>Shared communal destination accessible via the weighted Dijkstra navigation graph.</p>`
+            : `<p>Shared communal atrium accessible via the weighted Dijkstra navigation graph.</p>`
         }
-      </div>
-
-      <div class="phase-notice">
-        Tip: Click <strong>Call Stand-Up</strong> in the top bar to watch Izmi gather teammates in the Meeting Room.
       </div>
     `;
     inspectorDrawer.classList.add("open");
+  }
+
+  // Phase 3: Kanban Sprint Board UI
+  function initKanbanControls() {
+    if (!KanbanStore || !kanbanAssigneeSelect) return;
+    kanbanAssigneeSelect.innerHTML = AGENTS.filter((a) => a.id !== "agent-07")
+      .map((a) => `<option value="${a.id}">${a.name} (${a.title})</option>`)
+      .join("");
+
+    kanbanAddForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      KanbanStore.addTask(kanbanTitleInput.value, kanbanAssigneeSelect.value, kanbanPrioritySelect.value);
+      kanbanTitleInput.value = "";
+      renderKanbanBoard();
+    });
+
+    btnResetKanban.addEventListener("click", () => {
+      KanbanStore.resetBoard();
+      renderKanbanBoard();
+    });
+
+    KanbanStore.subscribe(() => {
+      if (document.getElementById("view-kanban").classList.contains("active")) {
+        renderKanbanBoard();
+      }
+    });
+
+    kanbanBoardGrid.addEventListener("click", (e) => {
+      const moveBtn = e.target.closest("[data-move-task]");
+      if (moveBtn) {
+        KanbanStore.moveTask(moveBtn.dataset.moveTask, moveBtn.dataset.targetStatus);
+        return;
+      }
+      const delBtn = e.target.closest("[data-del-task]");
+      if (delBtn) {
+        KanbanStore.deleteTask(delBtn.dataset.delTask);
+      }
+    });
+  }
+
+  function renderKanbanBoard() {
+    if (!KanbanStore || !kanbanBoardGrid) return;
+    const tasks = KanbanStore.getTasks();
+    const columns = [
+      { id: "BACKLOG", label: "Backlog", next: "IN_PROGRESS", nextLabel: "Start →" },
+      { id: "IN_PROGRESS", label: "In Progress", next: "QA_REVIEW", nextLabel: "To QA →" },
+      { id: "QA_REVIEW", label: "QA Review (Sofea)", next: "DONE", nextLabel: "Approve →" },
+      { id: "DONE", label: "Done", next: null, nextLabel: "" }
+    ];
+
+    kanbanBoardGrid.innerHTML = columns.map((col) => {
+      const colTasks = tasks.filter((t) => t.status === col.id);
+      return `
+        <div class="kanban-col">
+          <div class="kanban-col-head">
+            <span>${col.label}</span>
+            <span class="kanban-count">${colTasks.length}</span>
+          </div>
+          ${colTasks.map((t) => {
+            const owner = AGENTS.find((a) => a.id === t.assigneeId);
+            const pct = col.id === "QA_REVIEW" ? Math.round(t.qaProgress || 0) : Math.round(t.progress || 0);
+            return `
+              <article class="kanban-card">
+                <div class="kanban-meta">
+                  <strong>${owner ? owner.name : "Team"}</strong>
+                  <span class="prio-badge prio-${t.priority}">${t.priority}</span>
+                </div>
+                <div class="kanban-card-title">${t.title}</div>
+                ${col.id === "IN_PROGRESS" || col.id === "QA_REVIEW" ? `
+                  <div class="kanban-progress-track">
+                    <div class="kanban-progress-fill" style="width:${pct}%"></div>
+                  </div>
+                ` : ""}
+                ${t.qaNotes ? `<div style="font-size:11px; color:#0f766e; font-weight:600;">${t.qaNotes}</div>` : ""}
+                <div class="kanban-card-actions">
+                  ${col.next ? `<button class="k-mini-btn" data-move-task="${t.id}" data-target-status="${col.next}">${col.nextLabel}</button>` : `<span></span>`}
+                  <button class="k-mini-btn" data-del-task="${t.id}" title="Delete Task">&times;</button>
+                </div>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }).join("");
   }
 
   function renderTeamRoster() {
@@ -381,13 +464,13 @@
               </svg>
             </div>
             <div>
-              <div style="font-size:10px; font-weight:800; color:#756354;">${agent.code}</div>
+              <div style="font-size:10px; font-weight:800; color:#64748b;">${agent.code}</div>
               <div class="card-title">${agent.name}</div>
               <div class="card-role">${agent.title}</div>
             </div>
           </div>
-          <p style="font-size:13px; color:#5c4a3c; line-height:1.4;">${agent.roleDescription}</p>
-          <div style="font-size:12px; color:#756354;"><strong>Home Station:</strong> ${zone ? zone.name : ""}</div>
+          <p style="font-size:13px; color:#475569; line-height:1.4;">${agent.roleDescription}</p>
+          <div style="font-size:12px; color:#64748b;"><strong>Home Station:</strong> ${zone ? zone.name : ""}</div>
           <div class="tag-row">
             ${agent.skills.map((s) => `<span class="skill-tag">${s}</span>`).join("")}
           </div>
@@ -421,7 +504,7 @@
               <div class="card-role" style="color:${zone.badgeColor};">${staff.length} Assigned Workstation(s)</div>
             </div>
           </div>
-          <p style="font-size:13px; color:#5c4a3c; line-height:1.45;">${zone.description}</p>
+          <p style="font-size:13px; color:#475569; line-height:1.45;">${zone.description}</p>
           <div class="card-actions">
             <button class="primary-pill-btn" data-locate-zone="${zone.id}">Focus Zone on Floorplan &rarr;</button>
           </div>
@@ -448,13 +531,15 @@
       <div class="roadmap-item">
         <div>
           <h3 style="font-size:16px; font-weight:800; margin-bottom:4px;">${item.phase}</h3>
-          <p style="font-size:13px; color:#5c4a3c; line-height:1.45;">${item.details}</p>
+          <p style="font-size:13px; color:#475569; line-height:1.45;">${item.details}</p>
         </div>
         <span class="status-pill ${item.active ? "status-active" : "status-upcoming"}">${item.status}</span>
       </div>
     `).join("");
   }
 
+  initKanbanControls();
+  renderKanbanBoard();
   renderTeamRoster();
   renderZonesView();
   renderRoadmapView();
