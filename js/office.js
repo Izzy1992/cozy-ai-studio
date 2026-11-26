@@ -323,15 +323,15 @@ window.Studio.OfficeRenderer = (function () {
           ${accessorySVG}
         </g>
 
-        <!-- Floating Name Tag + Live State Tag -->
-        <g transform="translate(0, -68)">
-          <rect x="-40" y="-11" width="80" height="19" rx="9.5" fill="#fffdf9" stroke="#d4c2a6" stroke-width="1.2"/>
-          <text x="0" y="1.5" text-anchor="middle" font-size="9.5" font-weight="800" fill="#33261d">${agent.name}</text>
-          <text class="agent-state-sub" x="0" y="-15" text-anchor="middle" font-size="8.5" font-weight="800" fill="#447252">WORKING</text>
+        <!-- Floating Name Tag (State sub-label shows on hover/selection) -->
+        <g transform="translate(0, -64)">
+          <rect x="-36" y="-9" width="72" height="16" rx="8" fill="#fffdf9" stroke="#d4c2a6" stroke-width="1.2"/>
+          <text x="0" y="2" text-anchor="middle" font-size="9" font-weight="800" fill="#33261d">${agent.name}</text>
+          <text class="agent-state-sub" x="0" y="-13" text-anchor="middle" font-size="8" font-weight="800" fill="#447252">WORKING</text>
         </g>
 
-        <!-- Phase 2.3: In-World Speech / Thought Bubble -->
-        <g class="agent-speech-bubble" transform="translate(0, -104)" opacity="0">
+        <!-- In-World Speech / Thought Bubble -->
+        <g class="agent-speech-bubble" transform="translate(0, -96)" opacity="0">
           <rect class="bubble-bg" x="-72" y="-14" width="144" height="22" rx="11" fill="#fffdf9" stroke="#d97706" stroke-width="1.4"/>
           <polygon points="-4,8 4,8 0,13" fill="#fffdf9" stroke="#d97706" stroke-width="1.2"/>
           <text class="bubble-text" x="0" y="0" text-anchor="middle" font-size="9" font-weight="700" fill="#33261d"></text>
@@ -429,6 +429,10 @@ window.Studio.OfficeRenderer = (function () {
     const svg = `
       <svg class="office-svg" viewBox="60 55 1240 770" xmlns="http://www.w3.org/2000/svg">
         <defs>
+          <filter id="floorStaticShadow" x="-10%" y="-10%" width="120%" height="125%">
+            <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#33261d" flood-opacity="0.22"/>
+          </filter>
+
           <pattern id="woodPlanks" width="52" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(-27)">
             <rect width="52" height="26" fill="#dfb98e"/>
             <rect x="0" y="0" width="52" height="12" fill="#e7c69e"/>
@@ -447,21 +451,22 @@ window.Studio.OfficeRenderer = (function () {
           </linearGradient>
         </defs>
 
-        <!-- U-SHAPED FLOOR SLAB & WOODEN DECK -->
-        <polygon points="680,145 1235,435 880,620 755,555 680,595 605,555 480,620 125,435"
-          fill="url(#woodPlanks)" stroke="#b08962" stroke-width="2.5"/>
-        <polygon points="480,620 680,515 680,725 480,825 260,710 260,505"
-          fill="url(#woodPlanks)" stroke="#b08962" stroke-width="2.5"/>
-        <polygon points="880,620 680,515 680,725 880,825 1100,710 1100,505"
-          fill="url(#woodPlanks)" stroke="#b08962" stroke-width="2.5"/>
+        <!-- STATIC FLOOR SLAB WITH BAKED DROP-SHADOW -->
+        <g filter="url(#floorStaticShadow)">
+          <polygon points="680,145 1235,435 880,620 755,555 680,595 605,555 480,620 125,435"
+            fill="url(#woodPlanks)" stroke="#b08962" stroke-width="2.5"/>
+          <polygon points="480,620 680,515 680,725 480,825 260,710 260,505"
+            fill="url(#woodPlanks)" stroke="#b08962" stroke-width="2.5"/>
+          <polygon points="880,620 680,515 680,725 880,825 1100,710 1100,505"
+            fill="url(#woodPlanks)" stroke="#b08962" stroke-width="2.5"/>
 
-        <!-- 3D Floor Slab Base Edges -->
-        <polygon points="125,435 260,505 260,527 125,457" fill="#b08962"/>
-        <polygon points="260,710 480,825 480,847 260,732" fill="#b08962"/>
-        <polygon points="480,825 680,725 680,747 480,847" fill="#8f6b47"/>
-        <polygon points="680,725 880,825 880,847 680,747" fill="#b08962"/>
-        <polygon points="880,825 1100,710 1100,732 880,847" fill="#8f6b47"/>
-        <polygon points="1100,505 1235,435 1235,457 1100,527" fill="#8f6b47"/>
+          <polygon points="125,435 260,505 260,527 125,457" fill="#b08962"/>
+          <polygon points="260,710 480,825 480,847 260,732" fill="#b08962"/>
+          <polygon points="480,825 680,725 680,747 480,847" fill="#8f6b47"/>
+          <polygon points="680,725 880,825 880,847 680,747" fill="#b08962"/>
+          <polygon points="880,825 1100,710 1100,732 880,847" fill="#8f6b47"/>
+          <polygon points="1100,505 1235,435 1235,457 1100,527" fill="#8f6b47"/>
+        </g>
 
         <!-- BACK PERIMETER STUDIO WALLS -->
         <polygon points="125,435 680,145 680,${145 - wallH} 125,${435 - wallH}"
@@ -628,8 +633,8 @@ window.Studio.OfficeRenderer = (function () {
 
         <!-- EXTERIOR NON-OVERLAPPING ZONE PLAQUES -->
         <g pointer-events="none" font-size="10.5" font-weight="800" fill="#33261d">
-          <rect x="415" y="162" width="122" height="20" rx="10" fill="rgba(255,253,249,0.96)" stroke="#f59e0b" stroke-width="1.5"/>
-          <text x="476" y="175.5" text-anchor="middle">MANAGER OFFICE</text>
+          <rect x="295" y="155" width="122" height="20" rx="10" fill="rgba(255,253,249,0.96)" stroke="#f59e0b" stroke-width="1.5"/>
+          <text x="356" y="168.5" text-anchor="middle">MANAGER OFFICE</text>
 
           <rect x="145" y="472" width="114" height="20" rx="10" fill="rgba(255,253,249,0.96)" stroke="#14b8a6" stroke-width="1.5"/>
           <text x="202" y="485.5" text-anchor="middle">MEETING ROOM</text>
