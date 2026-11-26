@@ -329,17 +329,28 @@ window.Studio.OfficeRenderer = (function () {
           <text x="0" y="1.5" text-anchor="middle" font-size="9.5" font-weight="800" fill="#33261d">${agent.name}</text>
           <text class="agent-state-sub" x="0" y="-15" text-anchor="middle" font-size="8.5" font-weight="800" fill="#447252">WORKING</text>
         </g>
+
+        <!-- Phase 2.3: In-World Speech / Thought Bubble -->
+        <g class="agent-speech-bubble" transform="translate(0, -104)" opacity="0">
+          <rect class="bubble-bg" x="-72" y="-14" width="144" height="22" rx="11" fill="#fffdf9" stroke="#d97706" stroke-width="1.4"/>
+          <polygon points="-4,8 4,8 0,13" fill="#fffdf9" stroke="#d97706" stroke-width="1.2"/>
+          <text class="bubble-text" x="0" y="0" text-anchor="middle" font-size="9" font-weight="700" fill="#33261d"></text>
+        </g>
       </g>
     `;
   }
 
-  // Smoothly update employee position and visual state classes without re-rendering the entire SVG
-  function updateAgentVisuals(agentStates) {
+  function updateAgentVisuals(agentStates, meetingInfo) {
     const layer = document.getElementById("agents-layer");
     if (!layer) return;
 
-    // Painter's algorithm: sort characters by Y so foreground characters overlap background characters naturally
-    const sorted = [...agentStates].sort((a, b) => a.x - b.x === 0 ? a.y - b.y : a.y - b.y);
+    // Update Meeting Room screen status indicator
+    const screenPulse = document.getElementById("meeting-screen-active");
+    if (screenPulse) {
+      screenPulse.setAttribute("opacity", meetingInfo && meetingInfo.active ? "1" : "0");
+    }
+
+    const sorted = [...agentStates].sort((a, b) => a.y - b.y);
 
     sorted.forEach((st) => {
       const el = layer.querySelector(`.interactive-agent[data-agent-id="${st.id}"]`);
@@ -347,7 +358,7 @@ window.Studio.OfficeRenderer = (function () {
 
       el.setAttribute("transform", `translate(${st.x.toFixed(1)}, ${st.y.toFixed(1)})`);
 
-      const isMoving = st.state === "WALKING" || st.state === "RETURNING_TO_DESK";
+      const isMoving = st.state === "WALKING" || st.state === "RETURNING_TO_DESK" || st.state === "PEER_REVIEW";
       const isWorking = st.state === "WORKING";
       el.classList.toggle("is-walking", isMoving);
       el.classList.toggle("is-working", isWorking);
@@ -361,17 +372,33 @@ window.Studio.OfficeRenderer = (function () {
           WALKING: "WALKING",
           RETURNING_TO_DESK: "RETURNING",
           USING_LOUNGE: "LOUNGE BREAK",
-          TAKING_BREAK: "BREAK",
-          IN_MEETING: "MEETING"
+          PEER_REVIEW: "PEER SYNC",
+          IN_MEETING: "STAND-UP"
         };
         subLabel.textContent = labelMap[st.state] || st.state;
         subLabel.setAttribute(
           "fill",
-          isMoving ? "#0284c7" : st.state === "USING_LOUNGE" ? "#9333ea" : st.state === "THINKING" ? "#d97706" : "#447252"
+          isMoving ? "#0284c7" : st.state === "IN_MEETING" ? "#0d9488" : st.state === "USING_LOUNGE" ? "#9333ea" : st.state === "THINKING" ? "#d97706" : "#447252"
         );
       }
 
-      // Re-append in Y-sorted order for clean isometric depth occlusion
+      const bubble = el.querySelector(".agent-speech-bubble");
+      const bubbleText = el.querySelector(".bubble-text");
+      const bubbleBg = el.querySelector(".bubble-bg");
+      if (bubble && bubbleText) {
+        if (st.speechText && st.speechTimer > 0) {
+          bubbleText.textContent = st.speechText;
+          const width = Math.max(96, Math.min(200, st.speechText.length * 5.4 + 22));
+          if (bubbleBg) {
+            bubbleBg.setAttribute("x", (-width / 2).toFixed(0));
+            bubbleBg.setAttribute("width", width.toFixed(0));
+          }
+          bubble.setAttribute("opacity", "1");
+        } else {
+          bubble.setAttribute("opacity", "0");
+        }
+      }
+
       layer.appendChild(el);
     });
   }
@@ -444,6 +471,10 @@ window.Studio.OfficeRenderer = (function () {
           <polygon points="193,373 312,311 312,347 193,409" fill="#0f172a"/>
           <polygon points="210,392 238,372 268,365 298,332" fill="none" stroke="#4ade80" stroke-width="2.5"/>
           <circle cx="298" cy="332" r="3.5" fill="#fbbf24"/>
+          <g id="meeting-screen-active" opacity="0">
+            <circle cx="204" cy="378" r="4" fill="#22c55e"/>
+            <polygon points="215,372 285,335 285,344 215,381" fill="#38bdf8"/>
+          </g>
         </g>
 
         <!-- QA & Child Safety Checklist Wall Board -->
@@ -495,14 +526,12 @@ window.Studio.OfficeRenderer = (function () {
         ${isoWallSegment(925, 415, 1005, 458, 58, { isGlass: true, trimColor: "#7c3aed" })}
 
         <!-- FURNITURE & PROPS -->
-        <!-- 1. Manager Suite (Izmi) -->
         ${renderBookshelf(565, 225)}
         ${renderFileCabinet(400, 250)}
         ${renderChair(485, 250, "#d97706")}
         ${renderWorkstation(445, 280, "manager")}
         ${renderPlant(375, 275, 0.92)}
 
-        <!-- 2. Meeting Room Conference Table & 6 Chairs -->
         <g class="zone-hotspot" data-zone-id="meeting">
           ${renderChair(235, 395, "#0d9488")}
           ${renderChair(275, 378, "#0d9488")}
@@ -514,7 +543,6 @@ window.Studio.OfficeRenderer = (function () {
           ${renderChair(315, 450, "#0d9488")}
         </g>
 
-        <!-- 3. Garden & Cozy Lounge Atrium -->
         <g class="zone-hotspot" data-zone-id="lounge">
           ${renderAtriumTree(680, 305, 1.02)}
           ${renderAtriumTree(565, 392, 0.9)}
@@ -539,13 +567,11 @@ window.Studio.OfficeRenderer = (function () {
           ${isoBox(680, 456, 11, 7, 13, { top: "#ef4444", left: "#b91c1c", right: "#dc2626" })}
         </g>
 
-        <!-- 4. QA & Child Safety Wing (Sofea) -->
         ${renderBookshelf(1125, 385)}
         ${renderChair(1075, 395, "#447252")}
         ${renderWorkstation(1030, 422, "qa")}
         ${renderPlant(1155, 445, 0.95)}
 
-        <!-- 5. Developer Wing (Isaac & Hayyan) -->
         <g>
           <polygon points="315,615 395,657 395,705 315,663" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
           <circle cx="338" cy="645" r="4" fill="#38bdf8"/>
@@ -559,7 +585,6 @@ window.Studio.OfficeRenderer = (function () {
         ${renderChair(515, 640, "#7c3aed")}
         ${renderPlant(305, 685, 1.0)}
 
-        <!-- 6. Art & Audio Studio Wing (Izzy, Anis, Abang) -->
         <g>
           <polygon points="965,657 1045,615 1045,663 965,705" fill="#fffbeb" stroke="#db2777" stroke-width="2"/>
           <circle cx="990" cy="665" r="5" fill="#f472b6"/>
