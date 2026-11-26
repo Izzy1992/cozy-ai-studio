@@ -84,6 +84,33 @@
   pointer-events: none;
 }
 
+/* Directional Flip Wrapper (Does NOT flip text tags or speech bubbles) */
+.agent-flip-wrap {
+  transition: transform 0.18s ease;
+}
+
+.interactive-agent.facing-left .agent-flip-wrap {
+  transform: scaleX(-1);
+}
+
+/* Seated Posture Toggle when WORKING at Desk */
+.interactive-agent .legs-seated {
+  display: none;
+}
+
+.interactive-agent.is-seated .legs-standing {
+  display: none;
+}
+
+.interactive-agent.is-seated .legs-seated {
+  display: inline;
+}
+
+.interactive-agent.is-seated .agent-body-bob {
+  transform: translateY(3.5px);
+  animation: none;
+}
+
 /* State-Driven Character Animations */
 .agent-body-bob {
   animation: gentleBob 2.8s infinite ease-in-out;
@@ -95,12 +122,12 @@
 
 .interactive-agent.is-walking .leg-left {
   animation: legSwingLeft 0.36s infinite ease-in-out;
-  transform-origin: -4px -15px;
+  transform-origin: -4px -14px;
 }
 
 .interactive-agent.is-walking .leg-right {
   animation: legSwingRight 0.36s infinite ease-in-out;
-  transform-origin: 4px -15px;
+  transform-origin: 4px -14px;
 }
 
 .interactive-agent.is-working .arm-left,
