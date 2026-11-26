@@ -1,9 +1,7 @@
 window.Studio = window.Studio || {};
 
 window.Studio.SimulationEngine = (function () {
-  // Koordinat Graf Laluan Heksagon Sarang Lebah (Setiap pintu betul-betul di tengah bukaan dinding!)
   const NAV_NODES = {
-    // Kerusi Meja Kerja Asal (Tepat di hadapan workstation setiap pekerja)
     desk_izmi:   { x: 690,  y: 162, zone: "manager",  label: "Izmi's Executive Desk" },
     desk_isaac:  { x: 318,  y: 592, zone: "dev",      label: "Isaac's Frontend Rig" },
     desk_hayyan: { x: 428,  y: 636, zone: "dev",      label: "Hayyan's Systems Rig" },
@@ -12,14 +10,12 @@ window.Studio.SimulationEngine = (function () {
     desk_abang:  { x: 1052, y: 572, zone: "creative", label: "Abang's Audio Rig" },
     desk_sofea:  { x: 962,  y: 306, zone: "qa",       label: "Sofea's QA Lab Desk" },
 
-    // Pintu Laluan Heksagon (Tepat pada bukaan dinding antara Atrium & Jabatan)
     door_manager: { x: 635, y: 295, zone: "manager",  label: "Manager Office Doorway" },
     door_meeting: { x: 540, y: 386, zone: "meeting",  label: "Meeting Room Doorway" },
     door_dev:     { x: 540, y: 534, zone: "dev",      label: "Developer Wing Doorway" },
     door_creative:{ x: 820, y: 534, zone: "creative", label: "Art & Audio Doorway" },
     door_qa:      { x: 820, y: 386, zone: "qa",       label: "QA Lab Doorway" },
 
-    // Koridor Dalam Bilik
     aisle_manager:{ x: 665, y: 235, zone: "manager",  label: "Manager Suite Floor" },
     meeting_seat1:{ x: 360, y: 285, zone: "meeting",  label: "Meeting Table (NW Seat)" },
     meeting_seat2:{ x: 442, y: 288, zone: "meeting",  label: "Meeting Table (NE Seat)" },
@@ -31,37 +27,32 @@ window.Studio.SimulationEngine = (function () {
     aisle_cre_e:  { x: 995, y: 585, zone: "creative", label: "Creative East Aisle" },
     aisle_qa:     { x: 915, y: 345, zone: "qa",       label: "QA Lab Aisle" },
 
-    // Laluan Dalam Garden Lounge Atrium Tengah (Pusat: 680, 460)
     atrium_n:     { x: 645, y: 355, zone: "lounge",   label: "North Atrium Walkway" },
     atrium_w:     { x: 585, y: 420, zone: "lounge",   label: "West Atrium Walkway" },
     atrium_sw:    { x: 585, y: 500, zone: "lounge",   label: "South-West Atrium Walkway" },
     atrium_s:     { x: 680, y: 505, zone: "lounge",   label: "Atrium Espresso Bar" },
     atrium_se:    { x: 775, y: 500, zone: "lounge",   label: "South-East Atrium Walkway" },
     atrium_e:     { x: 775, y: 420, zone: "lounge",   label: "East Atrium Walkway" },
-    lounge_sofa_w:{ x: 625, y: 462, zone: "lounge",   label: "Pink Lounge Sofa" },
-    lounge_sofa_e:{ x: 735, y: 486, zone: "lounge",   label: "Blue Lounge Sofa" }
+    lounge_sofa_w:{ x: 625, y: 462, zone: "lounge",   label: "West Lounge Sofa" },
+    lounge_sofa_e:{ x: 735, y: 486, zone: "lounge",   label: "East Lounge Sofa" }
   };
 
   const NAV_EDGES = [
-    // Manager Office <-> Atrium
     ["desk_izmi", "aisle_manager"],
     ["aisle_manager", "door_manager"],
     ["door_manager", "atrium_n"],
 
-    // Meeting Room <-> Atrium
     ["door_meeting", "atrium_w"],
     ["door_meeting", "meeting_seat1"],
     ["door_meeting", "meeting_seat2"],
     ["door_meeting", "meeting_seat3"],
     ["door_meeting", "meeting_seat4"],
 
-    // Developer Wing <-> Atrium
     ["door_dev", "atrium_sw"],
     ["door_dev", "aisle_dev"],
     ["aisle_dev", "desk_isaac"],
     ["aisle_dev", "desk_hayyan"],
 
-    // Art & Audio <-> Atrium
     ["door_creative", "atrium_se"],
     ["door_creative", "aisle_cre_w"],
     ["aisle_cre_w", "desk_izzy"],
@@ -69,12 +60,10 @@ window.Studio.SimulationEngine = (function () {
     ["aisle_cre_e", "desk_anis"],
     ["aisle_cre_e", "desk_abang"],
 
-    // QA Testing <-> Atrium
     ["door_qa", "atrium_e"],
     ["door_qa", "aisle_qa"],
     ["aisle_qa", "desk_sofea"],
 
-    // Laluan Bulatan Atrium Tengah
     ["atrium_n", "atrium_w"],
     ["atrium_n", "atrium_e"],
     ["atrium_w", "atrium_sw"],
@@ -175,7 +164,7 @@ window.Studio.SimulationEngine = (function () {
       WORKING: "Illustrating warm isometric props & palettes",
       THINKING: "Comparing pastel color harmony swatches",
       IDLE: "Inspecting studio visual consistency",
-      quotes: ["Warm cream + sage feels so cozy!", "Adding soft shadows to the planters.", "Palette harmony approved!"]
+      quotes: ["Warm oak + stone feels so clean!", "Adding soft shadows to the planters.", "Palette harmony approved!"]
     },
     "agent-06": {
       WORKING: "Mixing Web Audio chimes & character motion",
@@ -192,9 +181,9 @@ window.Studio.SimulationEngine = (function () {
   };
 
   const STANDUP_TOPICS = [
-    "Sprint 2.3: Daily Routine & Dialogue Sync",
+    "Sprint 3: Live Kanban & Milestone Review",
     "Child UX & Sound Cues Playtest Review",
-    "Hexagon Studio Layout & QA Sign-Off"
+    "Corporate Studio Layout & QA Sign-Off"
   ];
 
   let agentStates = [];
@@ -230,6 +219,10 @@ window.Studio.SimulationEngine = (function () {
 
     return agents.map((agent, idx) => {
       const homeNode = NAV_NODES[agent.homeNodeId];
+      const activeTask = window.Studio.KanbanStore
+        ? window.Studio.KanbanStore.getActiveTaskForAgent(agent.id)
+        : null;
+
       return {
         id: agent.id,
         name: agent.name,
@@ -244,10 +237,12 @@ window.Studio.SimulationEngine = (function () {
         x: homeNode.x,
         y: homeNode.y,
         waypoints: [],
-        currentActivity: ROLE_ACTIVITIES[agent.id].WORKING,
+        currentActivity: activeTask ? `Task: ${activeTask.title}` : ROLE_ACTIVITIES[agent.id].WORKING,
+        taskProgress: activeTask ? (agent.id === "agent-07" ? (activeTask.qaProgress || 0) : activeTask.progress) : 0,
+        activeTaskTitle: activeTask ? activeTask.title : "",
         activityDuration: 5 + idx * 3.2,
         nextIntendedActivity: "THINKING",
-        speechText: idx === 0 ? "Morning team! Day 1 sprint begins!" : "",
+        speechText: idx === 0 ? "Morning team! Sprint board is live!" : "",
         speechTimer: idx === 0 ? 4.2 : 0
       };
     });
@@ -258,7 +253,10 @@ window.Studio.SimulationEngine = (function () {
     st.state = newState;
 
     if (newState === "WORKING") {
-      st.currentActivity = ROLE_ACTIVITIES[st.id].WORKING;
+      const activeTask = window.Studio.KanbanStore
+        ? (window.Studio.KanbanStore.getActiveTaskForAgent(st.id) || window.Studio.KanbanStore.claimNextBacklogTask(st.id))
+        : null;
+      st.currentActivity = activeTask ? `Task: ${activeTask.title}` : ROLE_ACTIVITIES[st.id].WORKING;
       st.activityDuration = 10 + Math.random() * 9;
       st.nextIntendedActivity = Math.random() < 0.55 ? "THINKING" : "USING_LOUNGE";
       if (Math.random() < 0.35) {
@@ -297,7 +295,7 @@ window.Studio.SimulationEngine = (function () {
       st.nextIntendedActivity = "RETURNING_TO_DESK";
       speak(st, isEspresso ? "Fresh espresso boost!" : "Nice garden breeze~", 4.0);
     } else if (newState === "PEER_REVIEW") {
-      st.currentActivity = "Syncing with teammates on current milestone";
+      st.currentActivity = "Syncing with teammates on current sprint";
       st.activityDuration = 5 + Math.random() * 3;
       st.nextIntendedActivity = "RETURNING_TO_DESK";
       const q = ROLE_ACTIVITIES[st.id].quotes;
@@ -488,6 +486,27 @@ window.Studio.SimulationEngine = (function () {
           st.state = "IDLE";
           st.currentActivity = "Studio closed overnight (Resumes 08:45 AM)";
           return;
+        }
+
+        // Advance active Kanban task while WORKING at desk
+        if (st.state === "WORKING" && window.Studio.KanbanStore) {
+          const res = window.Studio.KanbanStore.advanceAgentWork(st.id, dt * 3.8);
+          if (res && res.task) {
+            st.activeTaskTitle = res.task.title;
+            st.taskProgress = st.id === "agent-07" ? (res.task.qaProgress || 0) : res.task.progress;
+            st.currentActivity = `Task (${Math.round(st.taskProgress)}%): ${res.task.title}`;
+
+            if (res.event === "READY_FOR_QA") {
+              speak(st, `Done! Sent "${res.task.title.slice(0, 22)}..." to Sofea for QA!`, 4.8);
+            } else if (res.event === "QA_APPROVED") {
+              speak(st, `QA Approved: "${res.task.title.slice(0, 22)}..."!`, 4.8);
+            } else if (res.event === "QA_RETURNED") {
+              speak(st, `Found a small UI tweak on "${res.task.title.slice(0, 18)}..."!`, 4.8);
+            }
+          } else {
+            st.activeTaskTitle = "";
+            st.taskProgress = 0;
+          }
         }
 
         st.activityDuration -= dt;
