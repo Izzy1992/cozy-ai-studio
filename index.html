@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sunbeam Indie Studio — Corporate Virtual Office Simulation</title>
-  <link rel="stylesheet" href="css/style.css?v=3.0" />
-  <link rel="stylesheet" href="css/office.css?v=3.0" />
+  <title>Sunbeam Indie Studio — Corporate Virtual Office &amp; Sprint Kanban</title>
+  <link rel="stylesheet" href="css/style.css?v=3.2" />
+  <link rel="stylesheet" href="css/office.css?v=3.2" />
 </head>
 <body>
   <div id="app-shell">
@@ -21,13 +21,14 @@
         </div>
         <div>
           <h1 class="studio-title">Sunbeam Indie Studio</h1>
-          <span class="studio-subtitle">Isometric Corporate Headquarters &bull; Autonomous Team Simulation</span>
+          <span class="studio-subtitle">Corporate Headquarters &bull; Live Sprint Kanban &amp; Team Simulation</span>
         </div>
       </div>
 
       <!-- Primary Navigation -->
       <nav class="studio-nav" aria-label="Studio Navigation">
         <button class="nav-btn active" data-view="office">Isometric Office</button>
+        <button class="nav-btn" data-view="kanban">Sprint Board</button>
         <button class="nav-btn" data-view="team">Team Roster (7)</button>
         <button class="nav-btn" data-view="zones">Office Zones (6)</button>
         <button class="nav-btn" data-view="roadmap">Phase Roadmap</button>
@@ -81,7 +82,7 @@
           <!-- Floating Helper Tip -->
           <div class="canvas-hint">
             <span id="sim-status-dot" class="status-dot running"></span>
-            <span id="sim-status-text">Simulation Running (1x)</span> &bull; Click any employee to inspect live state &amp; dialogue
+            <span id="sim-status-text">Simulation Running (1x)</span> &bull; Click any employee to inspect live tasks &amp; progress
           </div>
         </div>
 
@@ -95,7 +96,31 @@
         </aside>
       </section>
 
-      <!-- VIEW 2: TEAM ROSTER -->
+      <!-- VIEW 2: PHASE 3 KANBAN SPRINT BOARD -->
+      <section id="view-kanban" class="view-section panel-scroll">
+        <div class="kanban-header-bar">
+          <div class="section-header">
+            <h2>Sprint Kanban Board (Live Agent Task Engine)</h2>
+            <p>Assign tasks to employees—their overhead progress bars update live as they work and pass items to Sofea for QA review.</p>
+          </div>
+          <button id="btn-reset-kanban" class="sim-btn">Reset Default Tasks</button>
+        </div>
+
+        <form id="kanban-add-form" class="kanban-add-form">
+          <input type="text" id="kanban-title-input" placeholder="New studio task (e.g., Add cozy fireplace lighting)..." required />
+          <select id="kanban-assignee-select" aria-label="Assign to employee"></select>
+          <select id="kanban-priority-select" aria-label="Priority">
+            <option value="High">High Priority</option>
+            <option value="Medium" selected>Medium Priority</option>
+            <option value="Low">Low Priority</option>
+          </select>
+          <button type="submit" class="primary-pill-btn">+ Assign Task</button>
+        </form>
+
+        <div id="kanban-board-grid" class="kanban-board-grid"></div>
+      </section>
+
+      <!-- VIEW 3: TEAM ROSTER -->
       <section id="view-team" class="view-section panel-scroll">
         <div class="section-header">
           <h2>AI Studio Employees (7 Agents)</h2>
@@ -104,7 +129,7 @@
         <div id="team-grid" class="cards-grid"></div>
       </section>
 
-      <!-- VIEW 3: OFFICE ZONES -->
+      <!-- VIEW 4: OFFICE ZONES -->
       <section id="view-zones" class="view-section panel-scroll">
         <div class="section-header">
           <h2>Corporate Headquarters Floorplan &amp; Zones</h2>
@@ -113,7 +138,7 @@
         <div id="zones-grid" class="cards-grid"></div>
       </section>
 
-      <!-- VIEW 4: PHASE ROADMAP -->
+      <!-- VIEW 5: PHASE ROADMAP -->
       <section id="view-roadmap" class="view-section panel-scroll">
         <div class="section-header">
           <h2>Development Phases &amp; Architecture Transparency</h2>
@@ -124,9 +149,10 @@
     </main>
   </div>
 
-  <script src="js/agents.js?v=3.0"></script>
-  <script src="js/office.js?v=3.0"></script>
-  <script src="js/simulation.js?v=3.0"></script>
-  <script src="js/app.js?v=3.0"></script>
+  <script src="js/agents.js?v=3.2"></script>
+  <script src="js/kanban.js?v=3.2"></script>
+  <script src="js/office.js?v=3.2"></script>
+  <script src="js/simulation.js?v=3.2"></script>
+  <script src="js/app.js?v=3.2"></script>
 </body>
 </html>
