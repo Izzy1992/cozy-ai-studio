@@ -1,298 +1,428 @@
-window.Studio = window.Studio || {};
+(function () {
+  const { AGENTS, ZONES, ROADMAP, OfficeRenderer, SimulationEngine } = window.Studio;
 
-window.Studio.ZONES = [
-  {
-    id: "manager",
-    name: "Studio Manager Office",
-    shortName: "Manager Office",
-    description: "Glass-enclosed North-West corner suite with panoramic windows, executive mahogany desk, filing storage, bookshelf, framed studio art, and direct atrium doorway.",
-    occupants: ["agent-01"],
-    focus: { x: 220, y: 195, zoom: 1.32 },
-    badgeColor: "#d97706"
-  },
-  {
-    id: "meeting",
-    name: "Meeting Room",
-    shortName: "Meeting Room",
-    description: "Dedicated West-wing conference suite with an oak boardroom table, six chairs, large wall presentation monitor, and project pinboards.",
-    occupants: [],
-    focus: { x: 420, y: 40, zoom: 1.3 },
-    badgeColor: "#0d9488"
-  },
-  {
-    id: "dev",
-    name: "Developer Wing",
-    shortName: "Developer Wing",
-    description: "Spacious South-West engineering wing separated from the atrium by grounded glass walls, housing dual-monitor rigs, a system architecture board, and wide walkways.",
-    occupants: ["agent-03", "agent-04"],
-    focus: { x: 180, y: -155, zoom: 1.28 },
-    badgeColor: "#2563eb"
-  },
-  {
-    id: "lounge",
-    name: "Garden & Cozy Lounge Atrium",
-    shortName: "Garden Lounge",
-    description: "Welcoming central relaxation courtyard featuring plush cushioned sofas, coffee table, espresso bar, stone water fountain, warm garden lanterns, stepping-stone walkways, and lush trees.",
-    occupants: [],
-    focus: { x: 0, y: 45, zoom: 1.28 },
-    badgeColor: "#447252"
-  },
-  {
-    id: "creative",
-    name: "Art & Audio Studio",
-    shortName: "Art & Audio",
-    description: "South-East creative wing with acoustic wall panels, storyboards, digital pen display, color palettes, studio monitor speakers, and mixing equipment.",
-    occupants: ["agent-02", "agent-05", "agent-06"],
-    focus: { x: -230, y: -155, zoom: 1.28 },
-    badgeColor: "#db2777"
-  },
-  {
-    id: "qa",
-    name: "QA & Child Safety Lab",
-    shortName: "QA Testing",
-    description: "North-East testing wing with multi-monitor bug tracking displays, handheld tablet & mobile test rigs, QA checklist board, and child-safety audit binders.",
-    occupants: ["agent-07"],
-    focus: { x: -340, y: 40, zoom: 1.32 },
-    badgeColor: "#7c3aed"
-  }
-];
+  const navButtons = document.querySelectorAll(".nav-btn");
+  const viewSections = document.querySelectorAll(".view-section");
+  const isoViewport = document.getElementById("iso-viewport");
+  const isoStage = document.getElementById("iso-stage");
+  const zoomReadout = document.getElementById("zoom-readout");
+  const btnZoomIn = document.getElementById("btn-zoom-in");
+  const btnZoomOut = document.getElementById("btn-zoom-out");
+  const btnResetView = document.getElementById("btn-reset-view");
+  const zonePills = document.querySelectorAll(".zone-pill");
 
-window.Studio.AGENTS = [
-  {
-    id: "agent-01",
-    code: "AGENT 01",
-    name: "Izmi",
-    title: "AI Studio Manager",
-    zoneId: "manager",
-    homeNodeId: "desk_izmi",
-    workstationName: "Executive Suite Desk #1 (North-West Glass Office)",
-    seatPos: { x: 465, y: 245 },
-    personality: "Organised, professional, responsible and strategic.",
-    roleDescription: "Coordinates all studio agents, distributes tasks, monitors milestones, and prepares daily Director reports.",
-    skills: ["Sprint Planning", "Task Triage", "Bottleneck Analysis", "Team Coordination"],
-    responsibilities: [
-      "Coordinate all seven studio agents",
-      "Distribute tasks and balance workloads",
-      "Monitor project progress and deadlines",
-      "Organise team meetings and review submissions",
-      "Prepare daily studio status reports"
-    ],
-    appearance: {
-      skin: "#d8a47f",
-      hair: "#1e293b",
-      hairStyle: "short",
-      shirt: "#d97706",
-      pants: "#334155",
-      shoes: "#1e293b",
-      accent: "#fef3c7",
-      accessory: "glasses"
-    }
-  },
-  {
-    id: "agent-02",
-    code: "AGENT 02",
-    name: "Izzy",
-    title: "Game Designer & Child Experience Designer",
-    zoneId: "creative",
-    homeNodeId: "desk_izzy",
-    workstationName: "Game Concept & Mechanics Desk #2 (Art & Audio Wing)",
-    seatPos: { x: 755, y: 552 },
-    personality: "Creative, imaginative and thoughtful.",
-    roleDescription: "Crafts engaging, age-appropriate gameplay loops, progression systems, and joyful interactions for young players.",
-    skills: ["Child UX (Ages 4–6)", "Gameplay Mechanics", "Level Pacing", "Interactive Storytelling"],
-    responsibilities: [
-      "Develop original kid-friendly game concepts",
-      "Design intuitive gameplay mechanics",
-      "Create rewarding progression systems",
-      "Ensure age-appropriate difficulty and feedback"
-    ],
-    appearance: {
-      skin: "#e2b08a",
-      hair: "#1e293b",
-      hairStyle: "spiky",
-      shirt: "#0284c7",
-      pants: "#1e3a8a",
-      shoes: "#f8fafc",
-      accent: "#e0f2fe",
-      accessory: "lanyard"
-    }
-  },
-  {
-    id: "agent-03",
-    code: "AGENT 03",
-    name: "Isaac",
-    title: "Senior Frontend Developer",
-    zoneId: "dev",
-    homeNodeId: "desk_isaac",
-    workstationName: "Frontend Engineering Rig #3 (Developer Wing)",
-    seatPos: { x: 365, y: 548 },
-    personality: "Analytical, precise and methodical.",
-    roleDescription: "Architects responsive HTML5, CSS3, and modular Vanilla JavaScript systems with clean 60fps performance.",
-    skills: ["HTML5 / CSS3", "Vanilla JS", "Responsive UI", "Browser Performance"],
-    responsibilities: [
-      "Develop clean semantic HTML structures",
-      "Write maintainable responsive CSS",
-      "Implement modular JavaScript architecture",
-      "Optimise rendering performance across devices"
-    ],
-    appearance: {
-      skin: "#e5b894",
-      hair: "#292524",
-      hairStyle: "short",
-      shirt: "#2563eb",
-      pants: "#1e293b",
-      shoes: "#0f172a",
-      accent: "#dbeafe",
-      accessory: "glasses"
-    }
-  },
-  {
-    id: "agent-04",
-    code: "AGENT 04",
-    name: "Hayyan",
-    title: "Game Systems & AI Developer",
-    zoneId: "dev",
-    homeNodeId: "desk_hayyan",
-    workstationName: "Systems & AI Architecture Rig #4 (Developer Wing)",
-    seatPos: { x: 525, y: 632 },
-    personality: "Technical, logical and curious.",
-    roleDescription: "Builds autonomous agent state machines, pathfinding, simulation engines, and future AI service adapters.",
-    skills: ["State Machines", "Simulation Logic", "Pathfinding", "AI Orchestration"],
-    responsibilities: [
-      "Develop core game logic and rules",
-      "Create autonomous character behaviours",
-      "Implement state management and simulation loops",
-      "Architect clean external AI integration contracts"
-    ],
-    appearance: {
-      skin: "#d6a17c",
-      hair: "#1c1917",
-      hairStyle: "curly",
-      shirt: "#7c3aed",
-      pants: "#312e81",
-      shoes: "#f1f5f9",
-      accent: "#ede9fe",
-      accessory: "none"
-    }
-  },
-  {
-    id: "agent-05",
-    code: "AGENT 05",
-    name: "Anis",
-    title: "Art Director & Environment Designer",
-    zoneId: "creative",
-    homeNodeId: "desk_anis",
-    workstationName: "Pen-Display & Palette Station #5 (Art & Audio Wing)",
-    seatPos: { x: 890, y: 628 },
-    personality: "Artistic, observant and imaginative.",
-    roleDescription: "Establishes warm visual direction, isometric environments, color palettes, and expressive character designs.",
-    skills: ["Isometric Art", "Color Theory", "Environment Design", "Character Concepts"],
-    responsibilities: [
-      "Design cohesive game environments and props",
-      "Establish warm, welcoming visual direction",
-      "Create character concepts and palettes",
-      "Review studio-wide visual consistency"
-    ],
-    appearance: {
-      skin: "#eab996",
-      hair: "#4a2c18",
-      hairStyle: "long",
-      shirt: "#db2777",
-      pants: "#4c1d95",
-      shoes: "#be185d",
-      accent: "#fce7f3",
-      accessory: "beret"
-    }
-  },
-  {
-    id: "agent-06",
-    code: "AGENT 06",
-    name: "Abang",
-    title: "Sound Engineer, Audio & Animation Designer",
-    zoneId: "creative",
-    homeNodeId: "desk_abang",
-    workstationName: "Sound Engineering & Motion Rig #6 (Art & Audio Wing)",
-    seatPos: { x: 1020, y: 552 },
-    personality: "Expressive, creative and detail-oriented.",
-    roleDescription: "Produces joyful sound effects, Web Audio synthesizers, studio mixes, and smooth character animations.",
-    skills: ["Sound Engineering", "Web Audio SFX", "Character Motion", "Studio Mixing"],
-    responsibilities: [
-      "Design and mix child-friendly sound effects and chimes",
-      "Create smooth character walking and working animations",
-      "Build subtle environmental audio-visual feedback",
-      "Coordinate sound cues with gameplay events"
-    ],
-    appearance: {
-      skin: "#c68b63",
-      hair: "#1e293b",
-      hairStyle: "short",
-      shirt: "#ea580c",
-      pants: "#292524",
-      shoes: "#f97316",
-      accent: "#ffedd5",
-      accessory: "headphones"
-    }
-  },
-  {
-    id: "agent-07",
-    code: "AGENT 07",
-    name: "Sofea",
-    title: "QA Engineer & Child Safety Reviewer",
-    zoneId: "qa",
-    homeNodeId: "desk_sofea",
-    workstationName: "Multi-Device QA & Child Safety Lab #7 (North-East Wing)",
-    seatPos: { x: 1055, y: 390 },
-    personality: "Careful, systematic and responsible.",
-    roleDescription: "Verifies cross-browser stability, responsive layouts, and strict child-safety standards across every studio release.",
-    skills: ["Cross-Device QA", "Child Safety Audits", "Responsive Testing", "Bug Reporting"],
-    responsibilities: [
-      "Test application functionality and edge cases",
-      "Verify desktop, tablet, and mobile layouts",
-      "Audit interactions for child safety and clarity",
-      "Prepare structured quality assurance reports"
-    ],
-    appearance: {
-      skin: "#f0c6a5",
-      hair: "#5c3a21",
-      hairStyle: "ponytail",
-      shirt: "#447252",
-      pants: "#1f2937",
-      shoes: "#374151",
-      accent: "#e6f2ea",
-      accessory: "glasses"
-    }
-  }
-];
+  const btnSimToggle = document.getElementById("btn-sim-toggle");
+  const simSpeedSelect = document.getElementById("sim-speed-select");
+  const btnCallMeeting = document.getElementById("btn-call-meeting");
+  const btnSimReset = document.getElementById("btn-sim-reset");
+  const simStatusDot = document.getElementById("sim-status-dot");
+  const simStatusText = document.getElementById("sim-status-text");
+  const studioTimeReadout = document.getElementById("studio-time-readout");
+  const studioPhaseReadout = document.getElementById("studio-phase-readout");
 
-window.Studio.ROADMAP = [
-  {
-    phase: "Phase 1 — Visual Foundation",
-    status: "COMPLETED & APPROVED",
-    active: false,
-    details: "U-shaped Garden Atrium isometric floorplan, grounded glass partitions, unobstructed doorways, 6 distinct zones, and 7 custom role workstations."
-  },
-  {
-    phase: "Phase 2.1 & 2.2 — State Machines & Pathfinding",
-    status: "ACTIVE (CURRENT BUILD)",
-    active: true,
-    details: "Independent employee state machines (WORKING, THINKING, IDLE, WALKING, USING_LOUNGE, IN_MEETING, RETURNING_TO_DESK) and obstacle-aware BFS waypoint pathfinding across all rooms."
-  },
-  {
-    phase: "Phase 2.3 & 2.4 — Autonomous Routines & Meetings",
-    status: "NEXT MILESTONE",
-    active: false,
-    details: "Rich daily work schedules, simulated peer conversations, and coordinated team gatherings in the Meeting Room."
-  },
-  {
-    phase: "Phase 3 — Management & Kanban Systems",
-    status: "PLANNED",
-    active: false,
-    details: "Full Kanban task board (Backlog to Completed), project creation, task assignment, simulated team chat, meeting notes generator, and Studio Dashboard metrics."
-  },
-  {
-    phase: "Phase 4 & 5 — Persistence & Future Real AI Integration",
-    status: "PLANNED",
-    active: false,
-    details: "Versioned LocalStorage state saving, JSON export/import backups, and clean orchestration service contracts for secure external AI execution."
+  const inspectorDrawer = document.getElementById("inspector-drawer");
+  const drawerKicker = document.getElementById("drawer-kicker");
+  const drawerBody = document.getElementById("drawer-body");
+  const btnCloseDrawer = document.getElementById("btn-close-drawer");
+
+  const teamGrid = document.getElementById("team-grid");
+  const zonesGrid = document.getElementById("zones-grid");
+  const roadmapList = document.getElementById("roadmap-list");
+
+  let camX = 0;
+  let camY = 14;
+  let camZoom = 1;
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let selectedAgentId = null;
+
+  function applyCameraTransform() {
+    const widthRatio = (window.innerWidth - 32) / 1180;
+    const heightRatio = (window.innerHeight - 96) / 730;
+    const responsiveBase = Math.min(1.22, Math.max(0.42, Math.min(widthRatio, heightRatio)));
+    const effectiveScale = camZoom * responsiveBase;
+
+    isoStage.style.transform = `translate(calc(-50% + ${camX}px), calc(-50% + ${camY}px)) scale(${effectiveScale})`;
+    zoomReadout.textContent = `${Math.round(camZoom * 100)}%`;
   }
-];
+
+  function focusCamera(x, y, zoom) {
+    camX = x;
+    camY = y;
+    camZoom = Math.min(1.95, Math.max(0.65, zoom));
+    applyCameraTransform();
+  }
+
+  OfficeRenderer.renderOffice(isoStage, AGENTS, ZONES);
+  applyCameraTransform();
+  window.addEventListener("resize", applyCameraTransform);
+
+  SimulationEngine.init(AGENTS, (states, clock) => {
+    if (clock) {
+      if (studioTimeReadout) studioTimeReadout.textContent = clock.timeStr;
+      if (studioPhaseReadout) studioPhaseReadout.textContent = clock.phase;
+      isoViewport.classList.toggle("evening-mood", clock.isEvening);
+      if (btnCallMeeting) {
+        btnCallMeeting.classList.toggle("active", clock.meetingActive);
+        btnCallMeeting.textContent = clock.meetingActive ? "Stand-Up Active" : "Call Stand-Up";
+      }
+    }
+    if (selectedAgentId && inspectorDrawer.classList.contains("open")) {
+      updateLiveInspectorTelemetry(selectedAgentId);
+    }
+  });
+
+  btnSimToggle.addEventListener("click", () => {
+    const nextRunning = !SimulationEngine.isRunning();
+    SimulationEngine.setRunning(nextRunning);
+    btnSimToggle.textContent = nextRunning ? "Pause" : "Resume";
+    btnSimToggle.classList.toggle("paused", !nextRunning);
+    isoStage.classList.toggle("sim-paused", !nextRunning);
+    simStatusDot.className = `status-dot ${nextRunning ? "running" : "paused"}`;
+    simStatusText.textContent = nextRunning
+      ? `Simulation Running (${simSpeedSelect.value}x)`
+      : "Simulation Paused";
+  });
+
+  simSpeedSelect.addEventListener("change", () => {
+    SimulationEngine.setSpeed(simSpeedSelect.value);
+    if (SimulationEngine.isRunning()) {
+      simStatusText.textContent = `Simulation Running (${simSpeedSelect.value}x)`;
+    }
+  });
+
+  if (btnCallMeeting) {
+    btnCallMeeting.addEventListener("click", () => {
+      const started = SimulationEngine.callTeamStandup();
+      if (started) {
+        const meetingZone = ZONES.find((z) => z.id === "meeting");
+        if (meetingZone) {
+          zonePills.forEach((p) => p.classList.toggle("active", p.dataset.zone === "meeting"));
+          focusCamera(meetingZone.focus.x, meetingZone.focus.y, meetingZone.focus.zoom);
+        }
+      }
+    });
+  }
+
+  btnSimReset.addEventListener("click", () => {
+    SimulationEngine.reset(AGENTS);
+    if (selectedAgentId && inspectorDrawer.classList.contains("open")) {
+      updateLiveInspectorTelemetry(selectedAgentId);
+    }
+  });
+
+  function switchView(viewName) {
+    navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.view === viewName));
+    viewSections.forEach((sec) => sec.classList.toggle("active", sec.id === `view-${viewName}`));
+  }
+
+  navButtons.forEach((btn) => {
+    btn.addEventListener("click", () => switchView(btn.dataset.view));
+  });
+
+  btnZoomIn.addEventListener("click", () => focusCamera(camX, camY, camZoom + 0.15));
+  btnZoomOut.addEventListener("click", () => focusCamera(camX, camY, camZoom - 0.15));
+  btnResetView.addEventListener("click", () => {
+    zonePills.forEach((p) => p.classList.toggle("active", p.dataset.zone === "all"));
+    focusCamera(0, 14, 1);
+  });
+
+  isoViewport.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.1 : -0.1;
+    focusCamera(camX, camY, camZoom + delta);
+  }, { passive: false });
+
+  isoViewport.addEventListener("pointerdown", (e) => {
+    if (e.target.closest(".interactive-agent") || e.target.closest(".zone-pill") || e.target.closest(".inspector-drawer")) {
+      return;
+    }
+    isDragging = true;
+    dragStartX = e.clientX - camX;
+    dragStartY = e.clientY - camY;
+    isoStage.classList.add("dragging");
+  });
+
+  window.addEventListener("pointermove", (e) => {
+    if (!isDragging) return;
+    camX = e.clientX - dragStartX;
+    camY = e.clientY - dragStartY;
+    applyCameraTransform();
+  });
+
+  window.addEventListener("pointerup", () => {
+    if (!isDragging) return;
+    isDragging = false;
+    isoStage.classList.remove("dragging");
+  });
+
+  zonePills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      const zId = pill.dataset.zone;
+      zonePills.forEach((p) => p.classList.toggle("active", p === pill));
+
+      if (zId === "all") {
+        focusCamera(0, 14, 1);
+        inspectorDrawer.classList.remove("open");
+      } else {
+        const zone = ZONES.find((z) => z.id === zId);
+        if (zone) {
+          focusCamera(zone.focus.x, zone.focus.y, zone.focus.zoom);
+          openZoneInspector(zone);
+        }
+      }
+    });
+  });
+
+  isoStage.addEventListener("click", (e) => {
+    const agentEl = e.target.closest(".interactive-agent");
+    if (agentEl) {
+      const agent = AGENTS.find((a) => a.id === agentEl.dataset.agentId);
+      if (agent) selectAgent(agent);
+      return;
+    }
+
+    const zoneEl = e.target.closest(".zone-hotspot");
+    if (zoneEl) {
+      const zone = ZONES.find((z) => z.id === zoneEl.dataset.zoneId);
+      if (zone) openZoneInspector(zone);
+    }
+  });
+
+  btnCloseDrawer.addEventListener("click", () => {
+    inspectorDrawer.classList.remove("open");
+    clearAgentHighlight();
+  });
+
+  function clearAgentHighlight() {
+    selectedAgentId = null;
+    document.querySelectorAll(".interactive-agent").forEach((el) => el.classList.remove("highlighted"));
+  }
+
+  function updateLiveInspectorTelemetry(agentId) {
+    const st = SimulationEngine.getAgentState(agentId);
+    if (!st) return;
+
+    const badgeEl = document.getElementById("live-state-badge");
+    const actEl = document.getElementById("live-activity-text");
+    const locEl = document.getElementById("live-location-text");
+    const nextEl = document.getElementById("live-next-text");
+
+    if (badgeEl) {
+      badgeEl.className = `state-badge state-${st.state}`;
+      badgeEl.textContent = st.state.replace(/_/g, " ");
+    }
+    if (actEl) actEl.textContent = st.currentActivity;
+    if (locEl) {
+      const z = ZONES.find((zone) => zone.id === st.currentZone);
+      locEl.textContent = z ? z.name : st.currentZone;
+    }
+    if (nextEl) nextEl.textContent = st.nextIntendedActivity.replace(/_/g, " ");
+  }
+
+  function selectAgent(agent) {
+    switchView("office");
+    clearAgentHighlight();
+    selectedAgentId = agent.id;
+
+    const el = document.querySelector(`.interactive-agent[data-agent-id="${agent.id}"]`);
+    if (el) el.classList.add("highlighted");
+
+    const zone = ZONES.find((z) => z.id === agent.zoneId);
+    const st = SimulationEngine.getAgentState(agent.id);
+
+    drawerKicker.textContent = `${agent.code} • LIVE SIMULATION INSPECTOR`;
+    drawerBody.innerHTML = `
+      <div class="inspector-hero">
+        <div class="avatar-circle" style="background:${agent.appearance.accent}; border-color:${agent.appearance.shirt};">
+          <svg viewBox="0 0 36 36" width="32" height="32">
+            <circle cx="18" cy="14" r="7" fill="${agent.appearance.skin}"/>
+            <path d="M11,13 C11,6 25,6 25,13 Z" fill="${agent.appearance.hair}"/>
+            <rect x="9" y="22" width="18" height="12" rx="5" fill="${agent.appearance.shirt}"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="font-size:17px; font-weight:800;">${agent.name}</h3>
+          <div style="font-size:12px; font-weight:700; color:#c4552d;">${agent.title}</div>
+        </div>
+      </div>
+
+      <div class="live-telemetry-card">
+        <div class="telemetry-row">
+          <span style="font-weight:700; color:#756354;">Current State</span>
+          <span id="live-state-badge" class="state-badge state-${st ? st.state : 'WORKING'}">${st ? st.state.replace(/_/g, " ") : "WORKING"}</span>
+        </div>
+        <div class="telemetry-row">
+          <span style="font-weight:700; color:#756354;">Current Zone</span>
+          <strong id="live-location-text">${zone ? zone.name : ""}</strong>
+        </div>
+        <div style="font-size:12.5px; margin-top:2px;">
+          <span style="font-weight:700; color:#756354;">Activity:</span>
+          <span id="live-activity-text">${st ? st.currentActivity : ""}</span>
+        </div>
+        <div style="font-size:11.5px; color:#756354;">
+          <strong>Next State:</strong> <span id="live-next-text">${st ? st.nextIntendedActivity.replace(/_/g, " ") : "THINKING"}</span>
+        </div>
+        <div class="quick-action-row">
+          <button class="drawer-action-btn" id="btn-agent-lounge">Coffee Break</button>
+          <button class="drawer-action-btn" id="btn-agent-standup">Call Stand-Up</button>
+        </div>
+      </div>
+
+      <div class="inspector-section">
+        <h4>Home Workstation</h4>
+        <p><strong>${agent.workstationName}</strong></p>
+      </div>
+
+      <div class="inspector-section">
+        <h4>Personality &amp; Role</h4>
+        <p>${agent.personality} ${agent.roleDescription}</p>
+      </div>
+
+      <div class="inspector-section">
+        <h4>Core Skills</h4>
+        <div class="tag-row">
+          ${agent.skills.map((s) => `<span class="skill-tag">${s}</span>`).join("")}
+        </div>
+      </div>
+
+      <div class="inspector-section">
+        <h4>Key Responsibilities</h4>
+        <ul class="inspector-list">
+          ${agent.responsibilities.map((r) => `<li>${r}</li>`).join("")}
+        </ul>
+      </div>
+
+      <div class="phase-notice">
+        <strong>Simulated Activity (Phase 2.3 &amp; 2.4):</strong> Daily routines, peer dialogue bubbles, and coordinated stand-up meetings run locally in the browser.
+      </div>
+    `;
+
+    document.getElementById("btn-agent-lounge").onclick = () => SimulationEngine.sendAgentToLounge(agent.id);
+    document.getElementById("btn-agent-standup").onclick = () => SimulationEngine.callTeamStandup();
+
+    inspectorDrawer.classList.add("open");
+  }
+
+  function openZoneInspector(zone) {
+    clearAgentHighlight();
+    const zoneAgents = AGENTS.filter((a) => a.zoneId === zone.id);
+
+    drawerKicker.textContent = "STUDIO FLOORPLAN ZONE";
+    drawerBody.innerHTML = `
+      <div>
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:4px;">${zone.name}</h3>
+        <p style="font-size:13px; color:#756354; line-height:1.45;">${zone.description}</p>
+      </div>
+
+      <div class="inspector-section">
+        <h4>Assigned Station Staff (${zoneAgents.length})</h4>
+        ${
+          zoneAgents.length > 0
+            ? `<ul class="inspector-list">${zoneAgents
+                .map((a) => `<li><strong>${a.name}</strong> — ${a.title}</li>`)
+                .join("")}</ul>`
+            : `<p>Shared communal destination accessible via the BFS navigation graph.</p>`
+        }
+      </div>
+
+      <div class="phase-notice">
+        Tip: Click <strong>Call Stand-Up</strong> in the top bar to watch Izmi gather teammates in the Meeting Room.
+      </div>
+    `;
+    inspectorDrawer.classList.add("open");
+  }
+
+  function renderTeamRoster() {
+    teamGrid.innerHTML = AGENTS.map((agent) => {
+      const zone = ZONES.find((z) => z.id === agent.zoneId);
+      return `
+        <article class="studio-card">
+          <div class="card-top">
+            <div class="avatar-circle" style="background:${agent.appearance.accent}; border-color:${agent.appearance.shirt};">
+              <svg viewBox="0 0 36 36" width="32" height="32">
+                <circle cx="18" cy="14" r="7" fill="${agent.appearance.skin}"/>
+                <path d="M11,13 C11,6 25,6 25,13 Z" fill="${agent.appearance.hair}"/>
+                <rect x="9" y="22" width="18" height="12" rx="5" fill="${agent.appearance.shirt}"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-size:10px; font-weight:800; color:#756354;">${agent.code}</div>
+              <div class="card-title">${agent.name}</div>
+              <div class="card-role">${agent.title}</div>
+            </div>
+          </div>
+          <p style="font-size:13px; color:#5c4a3c; line-height:1.4;">${agent.roleDescription}</p>
+          <div style="font-size:12px; color:#756354;"><strong>Home Station:</strong> ${zone ? zone.name : ""}</div>
+          <div class="tag-row">
+            ${agent.skills.map((s) => `<span class="skill-tag">${s}</span>`).join("")}
+          </div>
+          <div class="card-actions">
+            <button class="primary-pill-btn" data-locate-agent="${agent.id}">Inspect in Office &rarr;</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    teamGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-locate-agent]");
+      if (btn) {
+        const agent = AGENTS.find((a) => a.id === btn.dataset.locateAgent);
+        if (agent) selectAgent(agent);
+      }
+    });
+  }
+
+  function renderZonesView() {
+    zonesGrid.innerHTML = ZONES.map((zone) => {
+      const staff = AGENTS.filter((a) => a.zoneId === zone.id);
+      return `
+        <article class="studio-card">
+          <div class="card-top">
+            <div class="avatar-circle" style="background:${zone.badgeColor}20; border-color:${zone.badgeColor}; color:${zone.badgeColor}; font-weight:900;">
+              ${zone.shortName.slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <div class="card-title">${zone.name}</div>
+              <div class="card-role" style="color:${zone.badgeColor};">${staff.length} Assigned Workstation(s)</div>
+            </div>
+          </div>
+          <p style="font-size:13px; color:#5c4a3c; line-height:1.45;">${zone.description}</p>
+          <div class="card-actions">
+            <button class="primary-pill-btn" data-locate-zone="${zone.id}">Focus Zone on Floorplan &rarr;</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    zonesGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-locate-zone]");
+      if (btn) {
+        const zone = ZONES.find((z) => z.id === btn.dataset.locateZone);
+        if (zone) {
+          switchView("office");
+          zonePills.forEach((p) => p.classList.toggle("active", p.dataset.zone === zone.id));
+          focusCamera(zone.focus.x, zone.focus.y, zone.focus.zoom);
+          openZoneInspector(zone);
+        }
+      }
+    });
+  }
+
+  function renderRoadmapView() {
+    roadmapList.innerHTML = ROADMAP.map((item) => `
+      <div class="roadmap-item">
+        <div>
+          <h3 style="font-size:16px; font-weight:800; margin-bottom:4px;">${item.phase}</h3>
+          <p style="font-size:13px; color:#5c4a3c; line-height:1.45;">${item.details}</p>
+        </div>
+        <span class="status-pill ${item.active ? "status-active" : "status-upcoming"}">${item.status}</span>
+      </div>
+    `).join("");
+  }
+
+  renderTeamRoster();
+  renderZonesView();
+  renderRoadmapView();
+})();
