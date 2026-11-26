@@ -2,6 +2,7 @@ window.Studio = window.Studio || {};
 
 window.Studio.SimulationEngine = (function () {
   const NAV_NODES = {
+    // Home Desk Seat Nodes
     desk_izmi:   { x: 465,  y: 245, zone: "manager",  label: "Izmi's Executive Desk" },
     desk_isaac:  { x: 365,  y: 548, zone: "dev",      label: "Isaac's Frontend Rig" },
     desk_hayyan: { x: 525,  y: 632, zone: "dev",      label: "Hayyan's Systems Rig" },
@@ -10,6 +11,7 @@ window.Studio.SimulationEngine = (function () {
     desk_abang:  { x: 1020, y: 552, zone: "creative", label: "Abang's Audio Rig" },
     desk_sofea:  { x: 1055, y: 390, zone: "qa",       label: "Sofea's QA Lab Desk" },
 
+    // Doorway & Corridor Waypoints
     door_manager: { x: 475, y: 318, zone: "manager",  label: "Manager Office Doorway" },
     corridor_nw:  { x: 520, y: 350, zone: "lounge",   label: "North-West Corridor" },
 
@@ -28,6 +30,7 @@ window.Studio.SimulationEngine = (function () {
 
     door_qa:      { x: 960, y: 436, zone: "qa",       label: "QA Lab Entrance" },
 
+    // Central Garden & Lounge Atrium Walkways
     atrium_w:     { x: 545, y: 435, zone: "lounge",   label: "West Garden Walkway" },
     atrium_s:     { x: 680, y: 498, zone: "lounge",   label: "South Atrium Espresso Bar" },
     atrium_e:     { x: 815, y: 435, zone: "lounge",   label: "East Garden Walkway" },
@@ -74,36 +77,64 @@ window.Studio.SimulationEngine = (function () {
     ["door_qa", "desk_sofea"]
   ];
 
+  // Weighted Adjacency Lookup (Euclidean distance in isometric space)
   const ADJACENCY = {};
   Object.keys(NAV_NODES).forEach((id) => (ADJACENCY[id] = []));
   NAV_EDGES.forEach(([a, b]) => {
-    if (ADJACENCY[a] && ADJACENCY[b]) {
-      ADJACENCY[a].push(b);
-      ADJACENCY[b].push(a);
+    const na = NAV_NODES[a];
+    const nb = NAV_NODES[b];
+    if (na && nb) {
+      const weight = Math.hypot(nb.x - na.x, nb.y - na.y);
+      ADJACENCY[a].push({ id: b, weight });
+      ADJACENCY[b].push({ id: a, weight });
     }
   });
 
+  // Dijkstra Shortest-Path Finder on the Weighted Isometric Waypoint Graph
   function findPath(startNodeId, goalNodeId) {
     if (startNodeId === goalNodeId) return [];
-    const queue = [[startNodeId]];
-    const visited = new Set([startNodeId]);
+    const dist = {};
+    const prev = {};
+    const unvisited = new Set(Object.keys(NAV_NODES));
 
-    while (queue.length > 0) {
-      const path = queue.shift();
-      const current = path[path.length - 1];
-      const neighbors = ADJACENCY[current] || [];
+    unvisited.forEach((id) => {
+      dist[id] = Infinity;
+      prev[id] = null;
+    });
+    dist[startNodeId] = 0;
 
-      for (const next of neighbors) {
-        if (next === goalNodeId) {
-          return path.slice(1).concat(next);
+    while (unvisited.size > 0) {
+      let current = null;
+      let bestDist = Infinity;
+      unvisited.forEach((id) => {
+        if (dist[id] < bestDist) {
+          bestDist = dist[id];
+          current = id;
         }
-        if (!visited.has(next)) {
-          visited.add(next);
-          queue.push(path.concat(next));
+      });
+
+      if (!current || current === goalNodeId) break;
+      unvisited.delete(current);
+
+      const neighbors = ADJACENCY[current] || [];
+      for (const edge of neighbors) {
+        if (!unvisited.has(edge.id)) continue;
+        const alt = dist[current] + edge.weight;
+        if (alt < dist[edge.id]) {
+          dist[edge.id] = alt;
+          prev[edge.id] = current;
         }
       }
     }
-    return [];
+
+    if (dist[goalNodeId] === Infinity) return [];
+    const path = [];
+    let step = goalNodeId;
+    while (step && step !== startNodeId) {
+      path.unshift(step);
+      step = prev[step];
+    }
+    return path;
   }
 
   const ROLE_ACTIVITIES = {
@@ -129,7 +160,7 @@ window.Studio.SimulationEngine = (function () {
       WORKING: "Tuning agent state transitions & pathfinding",
       THINKING: "Analyzing navigation graph edge weights",
       IDLE: "Inspecting simulation tick telemetry",
-      quotes: ["BFS pathfinding is zero-collision!", "State machine transitions locked in.", "Let's test multi-agent sync."]
+      quotes: ["Dijkstra pathfinding locked in!", "Zero doorway collisions now.", "Let's test multi-agent sync."]
     },
     "agent-05": {
       WORKING: "Illustrating warm isometric props & palettes",
@@ -164,8 +195,12 @@ window.Studio.SimulationEngine = (function () {
   let lastTimestamp = 0;
   let onTickCallback = null;
 
-  let studioMinutes = 555;
+  // Studio clock in minutes from midnight (starts at 09:05 AM = 545)
+  let studioMinutes = 545;
+  let dayCount = 1;
   let dailyStandupTriggered = false;
+  let eveningWrapTriggered = false;
+  let morningArrivalTriggered = true;
   let meetingState = { active: false, timer: 0, topic: STANDUP_TOPICS[0] };
 
   const LOUNGE_SPOTS = ["lounge_sofa_w", "lounge_sofa_e", "atrium_s", "atrium_n"];
@@ -178,8 +213,11 @@ window.Studio.SimulationEngine = (function () {
   }
 
   function createInitialStates(agents) {
-    studioMinutes = 555;
+    studioMinutes = 545;
+    dayCount = 1;
     dailyStandupTriggered = false;
+    eveningWrapTriggered = false;
+    morningArrivalTriggered = true;
     meetingState = { active: false, timer: 0, topic: STANDUP_TOPICS[0] };
 
     return agents.map((agent, idx) => {
@@ -201,8 +239,8 @@ window.Studio.SimulationEngine = (function () {
         currentActivity: ROLE_ACTIVITIES[agent.id].WORKING,
         activityDuration: 5 + idx * 3.2,
         nextIntendedActivity: "THINKING",
-        speechText: idx === 0 ? "Morning team! Let's build!" : "",
-        speechTimer: idx === 0 ? 4.0 : 0
+        speechText: idx === 0 ? "Morning team! Day 1 sprint begins!" : "",
+        speechTimer: idx === 0 ? 4.2 : 0
       };
     });
   }
@@ -317,16 +355,76 @@ window.Studio.SimulationEngine = (function () {
     return available[Math.floor(Math.random() * available.length)];
   }
 
+  // Check if another moving agent is already directly ahead on the same edge/doorway
+  function isWayBlockedAhead(st, targetPt) {
+    const dx = targetPt.x - st.x;
+    const dy = targetPt.y - st.y;
+    const distToNode = Math.hypot(dx, dy);
+    if (distToNode < 1) return false;
+    const dirX = dx / distToNode;
+    const dirY = dy / distToNode;
+
+    for (const other of agentStates) {
+      if (other.id === st.id) continue;
+      const otherMoving = other.state === "WALKING" || other.state === "RETURNING_TO_DESK";
+      if (!otherMoving) continue;
+
+      const ox = other.x - st.x;
+      const oy = other.y - st.y;
+      const d = Math.hypot(ox, oy);
+      if (d > 0 && d < 26) {
+        const dot = (ox * dirX + oy * dirY) / d;
+        // Yield smoothly along the exact corridor path without pushing off-graph
+        if (dot > 0.72) return true;
+      }
+    }
+    return false;
+  }
+
   function stepSimulation(dt) {
-    studioMinutes += dt * 2.0;
-    if (studioMinutes >= 1080) {
-      studioMinutes = 540;
+    const isOvernight = studioMinutes >= 1110 || studioMinutes < 525; // 6:30 PM - 8:45 AM
+    // Fast-forward overnight hours smoothly so the day/night cycle reads naturally
+    studioMinutes += dt * (isOvernight ? 18.0 : 2.0);
+
+    if (studioMinutes >= 1440) {
+      studioMinutes -= 1440;
+      dayCount++;
       dailyStandupTriggered = false;
+      eveningWrapTriggered = false;
+      morningArrivalTriggered = false;
     }
 
-    if (!dailyStandupTriggered && studioMinutes >= 870 && studioMinutes < 880) {
+    // 08:45 AM (525 mins): Morning arrival greeting & return to workstations
+    if (!morningArrivalTriggered && studioMinutes >= 525 && studioMinutes < 545) {
+      morningArrivalTriggered = true;
+      agentStates.forEach((st, idx) => {
+        if (idx === 0) speak(st, `Good morning team! Day ${dayCount} starts!`, 4.5);
+        if (st.currentNodeId !== st.homeNodeId) {
+          transitionState(st, "RETURNING_TO_DESK");
+        } else {
+          transitionState(st, "WORKING");
+        }
+      });
+    }
+
+    // 02:30 PM (870 mins): Scheduled Daily Stand-Up
+    if (!dailyStandupTriggered && studioMinutes >= 870 && studioMinutes < 885) {
       dailyStandupTriggered = true;
       callTeamStandup();
+    }
+
+    // 05:45 PM (1065 mins): Evening wrap-up — everyone wraps tasks & returns to desks / lounge
+    if (!eveningWrapTriggered && studioMinutes >= 1065 && studioMinutes < 1090) {
+      eveningWrapTriggered = true;
+      meetingState.active = false;
+      agentStates.forEach((st, idx) => {
+        speak(st, idx === 0 ? "Great work today! Wrapping up!" : "Saving progress for tonight!", 4.5);
+        if (st.currentNodeId !== st.homeNodeId) {
+          transitionState(st, "RETURNING_TO_DESK");
+        } else {
+          transitionState(st, "IDLE");
+        }
+      });
     }
 
     if (meetingState.active) {
@@ -360,6 +458,12 @@ window.Studio.SimulationEngine = (function () {
 
         const nextNodeId = st.waypoints[0];
         const targetPt = NAV_NODES[nextNodeId];
+
+        // Queue cleanly behind any agent directly ahead in a doorway/corridor
+        if (isWayBlockedAhead(st, targetPt)) {
+          return;
+        }
+
         const dx = targetPt.x - st.x;
         const dy = targetPt.y - st.y;
         const dist = Math.hypot(dx, dy);
@@ -379,6 +483,13 @@ window.Studio.SimulationEngine = (function () {
           st.y += (dy / dist) * walkSpeed * dt;
         }
       } else {
+        // Overnight rest period: keep agents stationary at desks until 08:45 AM
+        if (isOvernight) {
+          st.state = "IDLE";
+          st.currentActivity = "Studio closed overnight (Resumes 08:45 AM)";
+          return;
+        }
+
         st.activityDuration -= dt;
         if (st.activityDuration <= 0) {
           if (st.nextIntendedActivity === "USING_LOUNGE") {
@@ -397,27 +508,6 @@ window.Studio.SimulationEngine = (function () {
         }
       }
     });
-
-    for (let i = 0; i < agentStates.length; i++) {
-      for (let j = i + 1; j < agentStates.length; j++) {
-        const a = agentStates[i];
-        const b = agentStates[j];
-        const aMoving = a.state === "WALKING" || a.state === "RETURNING_TO_DESK";
-        const bMoving = b.state === "WALKING" || b.state === "RETURNING_TO_DESK";
-        if (!aMoving && !bMoving) continue;
-
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist > 0.1 && dist < 24) {
-          const push = (24 - dist) * 0.25;
-          const nx = dx / dist;
-          const ny = dy / dist;
-          if (aMoving) { a.x -= nx * push; a.y -= ny * push; }
-          if (bMoving) { b.x += nx * push; b.y += ny * push; }
-        }
-      }
-    }
   }
 
   function getClockSnapshot() {
@@ -426,14 +516,22 @@ window.Studio.SimulationEngine = (function () {
     const mm = total % 60;
     const ampm = hh24 >= 12 ? "PM" : "AM";
     const hh12 = hh24 % 12 || 12;
-    const timeStr = `${String(hh12).padStart(2, "0")}:${String(mm).padStart(2, "0")} ${ampm}`;
+    const timeStr = `Day ${dayCount} · ${String(hh12).padStart(2, "0")}:${String(mm).padStart(2, "0")} ${ampm}`;
 
     let phase = "Morning Sprint";
-    if (hh24 >= 12 && hh24 < 14) phase = "Midday Lounge";
+    if (hh24 >= 18 || hh24 < 8 || (hh24 === 8 && mm < 45)) phase = "After Hours";
+    else if (hh24 === 8) phase = "Morning Arrival";
+    else if (hh24 >= 12 && hh24 < 14) phase = "Midday Lounge";
     else if (hh24 >= 14 && hh24 < 16) phase = "Afternoon Sync";
-    else if (hh24 >= 16) phase = "Golden Hour Wrap";
+    else if (hh24 >= 16) phase = "Evening Wrap-Up";
 
-    return { timeStr, phase, isEvening: hh24 >= 16, meetingActive: meetingState.active, meetingTopic: meetingState.topic };
+    return {
+      timeStr,
+      phase,
+      isEvening: hh24 >= 16 || hh24 < 8,
+      meetingActive: meetingState.active,
+      meetingTopic: meetingState.topic
+    };
   }
 
   function loop(timestamp) {
