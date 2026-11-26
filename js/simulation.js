@@ -387,10 +387,9 @@ window.Studio.SimulationEngine = (function () {
     return false;
   }
 
-  function stepSimulation(dt, clockDt = dt) {
-    // The virtual clock runs at 1 virtual minute per real second.
-    // Agent movement and activity timers still use dt (and the user speed multiplier).
-    studioMinutes += clockDt;
+  function stepSimulation(dt) {
+    const isOvernight = studioMinutes >= 1110 || studioMinutes < 525;
+    studioMinutes += dt * (isOvernight ? 18.0 : 2.0);
 
     if (studioMinutes >= 1440) {
       studioMinutes -= 1440;
@@ -541,7 +540,7 @@ window.Studio.SimulationEngine = (function () {
     lastTimestamp = timestamp;
 
     if (isRunning) {
-      stepSimulation(rawDt * speedMultiplier, rawDt);
+      stepSimulation(rawDt * speedMultiplier);
       if (window.Studio.OfficeRenderer && window.Studio.OfficeRenderer.updateAgentVisuals) {
         window.Studio.OfficeRenderer.updateAgentVisuals(agentStates, { active: meetingState.active });
       }
