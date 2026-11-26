@@ -1,83 +1,93 @@
 window.Studio = window.Studio || {};
 
 window.Studio.SimulationEngine = (function () {
+  // Koordinat Graf Laluan Heksagon Sarang Lebah (Setiap pintu betul-betul di tengah bukaan dinding!)
   const NAV_NODES = {
-    // Home Desk Seat Nodes
-    desk_izmi:   { x: 465,  y: 245, zone: "manager",  label: "Izmi's Executive Desk" },
-    desk_isaac:  { x: 365,  y: 548, zone: "dev",      label: "Isaac's Frontend Rig" },
-    desk_hayyan: { x: 525,  y: 632, zone: "dev",      label: "Hayyan's Systems Rig" },
-    desk_izzy:   { x: 755,  y: 552, zone: "creative", label: "Izzy's Concept Desk" },
-    desk_anis:   { x: 890,  y: 628, zone: "creative", label: "Anis's Art Studio Desk" },
-    desk_abang:  { x: 1020, y: 552, zone: "creative", label: "Abang's Audio Rig" },
-    desk_sofea:  { x: 1055, y: 390, zone: "qa",       label: "Sofea's QA Lab Desk" },
+    // Kerusi Meja Kerja Asal (Tepat di hadapan workstation setiap pekerja)
+    desk_izmi:   { x: 690,  y: 162, zone: "manager",  label: "Izmi's Executive Desk" },
+    desk_isaac:  { x: 318,  y: 592, zone: "dev",      label: "Isaac's Frontend Rig" },
+    desk_hayyan: { x: 428,  y: 636, zone: "dev",      label: "Hayyan's Systems Rig" },
+    desk_izzy:   { x: 862,  y: 572, zone: "creative", label: "Izzy's Concept Desk" },
+    desk_anis:   { x: 962,  y: 625, zone: "creative", label: "Anis's Art Studio Desk" },
+    desk_abang:  { x: 1052, y: 572, zone: "creative", label: "Abang's Audio Rig" },
+    desk_sofea:  { x: 962,  y: 306, zone: "qa",       label: "Sofea's QA Lab Desk" },
 
-    // Doorway & Corridor Waypoints
-    door_manager: { x: 475, y: 318, zone: "manager",  label: "Manager Office Doorway" },
-    corridor_nw:  { x: 520, y: 350, zone: "lounge",   label: "North-West Corridor" },
+    // Pintu Laluan Heksagon (Tepat pada bukaan dinding antara Atrium & Jabatan)
+    door_manager: { x: 635, y: 295, zone: "manager",  label: "Manager Office Doorway" },
+    door_meeting: { x: 540, y: 386, zone: "meeting",  label: "Meeting Room Doorway" },
+    door_dev:     { x: 540, y: 534, zone: "dev",      label: "Developer Wing Doorway" },
+    door_creative:{ x: 820, y: 534, zone: "creative", label: "Art & Audio Doorway" },
+    door_qa:      { x: 820, y: 386, zone: "qa",       label: "QA Lab Doorway" },
 
-    door_meeting: { x: 392, y: 432, zone: "meeting",  label: "Meeting Room Entrance" },
-    meeting_seat1:{ x: 235, y: 395, zone: "meeting",  label: "Meeting Table (NW Seat)" },
-    meeting_seat2:{ x: 315, y: 400, zone: "meeting",  label: "Meeting Table (NE Seat)" },
-    meeting_seat3:{ x: 235, y: 450, zone: "meeting",  label: "Meeting Table (SW Seat)" },
-    meeting_seat4:{ x: 315, y: 450, zone: "meeting",  label: "Meeting Table (SE Seat)" },
+    // Koridor Dalam Bilik
+    aisle_manager:{ x: 665, y: 235, zone: "manager",  label: "Manager Suite Floor" },
+    meeting_seat1:{ x: 360, y: 285, zone: "meeting",  label: "Meeting Table (NW Seat)" },
+    meeting_seat2:{ x: 442, y: 288, zone: "meeting",  label: "Meeting Table (NE Seat)" },
+    meeting_seat3:{ x: 360, y: 338, zone: "meeting",  label: "Meeting Table (SW Seat)" },
+    meeting_seat4:{ x: 442, y: 338, zone: "meeting",  label: "Meeting Table (SE Seat)" },
 
-    door_dev:     { x: 538, y: 482, zone: "dev",      label: "Developer Wing Entrance" },
-    aisle_dev:    { x: 455, y: 575, zone: "dev",      label: "Developer Wing Aisle" },
+    aisle_dev:    { x: 425, y: 575, zone: "dev",      label: "Developer Wing Aisle" },
+    aisle_cre_w:  { x: 895, y: 555, zone: "creative", label: "Creative West Aisle" },
+    aisle_cre_e:  { x: 995, y: 585, zone: "creative", label: "Creative East Aisle" },
+    aisle_qa:     { x: 915, y: 345, zone: "qa",       label: "QA Lab Aisle" },
 
-    door_creative:{ x: 822, y: 482, zone: "creative", label: "Art & Audio Entrance" },
-    aisle_cre_w:  { x: 810, y: 585, zone: "creative", label: "Creative West Aisle" },
-    aisle_cre_e:  { x: 960, y: 585, zone: "creative", label: "Creative East Aisle" },
-
-    door_qa:      { x: 960, y: 436, zone: "qa",       label: "QA Lab Entrance" },
-
-    // Central Garden & Lounge Atrium Walkways
-    atrium_w:     { x: 545, y: 435, zone: "lounge",   label: "West Garden Walkway" },
-    atrium_s:     { x: 680, y: 498, zone: "lounge",   label: "South Atrium Espresso Bar" },
-    atrium_e:     { x: 815, y: 435, zone: "lounge",   label: "East Garden Walkway" },
-    atrium_n:     { x: 680, y: 372, zone: "lounge",   label: "Fountain Viewpoint" },
-    lounge_sofa_w:{ x: 622, y: 418, zone: "lounge",   label: "Pink Lounge Sofa" },
-    lounge_sofa_e:{ x: 738, y: 452, zone: "lounge",   label: "Blue Lounge Sofa" }
+    // Laluan Dalam Garden Lounge Atrium Tengah (Pusat: 680, 460)
+    atrium_n:     { x: 645, y: 355, zone: "lounge",   label: "North Atrium Walkway" },
+    atrium_w:     { x: 585, y: 420, zone: "lounge",   label: "West Atrium Walkway" },
+    atrium_sw:    { x: 585, y: 500, zone: "lounge",   label: "South-West Atrium Walkway" },
+    atrium_s:     { x: 680, y: 505, zone: "lounge",   label: "Atrium Espresso Bar" },
+    atrium_se:    { x: 775, y: 500, zone: "lounge",   label: "South-East Atrium Walkway" },
+    atrium_e:     { x: 775, y: 420, zone: "lounge",   label: "East Atrium Walkway" },
+    lounge_sofa_w:{ x: 625, y: 462, zone: "lounge",   label: "Pink Lounge Sofa" },
+    lounge_sofa_e:{ x: 735, y: 486, zone: "lounge",   label: "Blue Lounge Sofa" }
   };
 
   const NAV_EDGES = [
-    ["desk_izmi", "door_manager"],
-    ["door_manager", "corridor_nw"],
-    ["corridor_nw", "atrium_n"],
-    ["corridor_nw", "atrium_w"],
+    // Manager Office <-> Atrium
+    ["desk_izmi", "aisle_manager"],
+    ["aisle_manager", "door_manager"],
+    ["door_manager", "atrium_n"],
 
+    // Meeting Room <-> Atrium
     ["door_meeting", "atrium_w"],
     ["door_meeting", "meeting_seat1"],
     ["door_meeting", "meeting_seat2"],
     ["door_meeting", "meeting_seat3"],
     ["door_meeting", "meeting_seat4"],
 
-    ["atrium_w", "door_dev"],
-    ["atrium_w", "atrium_s"],
-    ["atrium_w", "lounge_sofa_w"],
-    ["atrium_n", "lounge_sofa_w"],
-    ["atrium_n", "atrium_e"],
-    ["atrium_s", "lounge_sofa_w"],
-    ["atrium_s", "lounge_sofa_e"],
-    ["atrium_s", "door_dev"],
-    ["atrium_s", "door_creative"],
-    ["atrium_e", "lounge_sofa_e"],
-    ["atrium_e", "door_creative"],
-    ["atrium_e", "door_qa"],
-
+    // Developer Wing <-> Atrium
+    ["door_dev", "atrium_sw"],
     ["door_dev", "aisle_dev"],
     ["aisle_dev", "desk_isaac"],
     ["aisle_dev", "desk_hayyan"],
 
+    // Art & Audio <-> Atrium
+    ["door_creative", "atrium_se"],
     ["door_creative", "aisle_cre_w"],
     ["aisle_cre_w", "desk_izzy"],
     ["aisle_cre_w", "aisle_cre_e"],
     ["aisle_cre_e", "desk_anis"],
     ["aisle_cre_e", "desk_abang"],
 
-    ["door_qa", "desk_sofea"]
+    // QA Testing <-> Atrium
+    ["door_qa", "atrium_e"],
+    ["door_qa", "aisle_qa"],
+    ["aisle_qa", "desk_sofea"],
+
+    // Laluan Bulatan Atrium Tengah
+    ["atrium_n", "atrium_w"],
+    ["atrium_n", "atrium_e"],
+    ["atrium_w", "atrium_sw"],
+    ["atrium_w", "lounge_sofa_w"],
+    ["atrium_sw", "atrium_s"],
+    ["atrium_sw", "lounge_sofa_w"],
+    ["atrium_s", "lounge_sofa_w"],
+    ["atrium_s", "lounge_sofa_e"],
+    ["atrium_s", "atrium_se"],
+    ["atrium_se", "atrium_e"],
+    ["atrium_e", "lounge_sofa_e"]
   ];
 
-  // Weighted Adjacency Lookup (Euclidean distance in isometric space)
   const ADJACENCY = {};
   Object.keys(NAV_NODES).forEach((id) => (ADJACENCY[id] = []));
   NAV_EDGES.forEach(([a, b]) => {
@@ -90,7 +100,6 @@ window.Studio.SimulationEngine = (function () {
     }
   });
 
-  // Dijkstra Shortest-Path Finder on the Weighted Isometric Waypoint Graph
   function findPath(startNodeId, goalNodeId) {
     if (startNodeId === goalNodeId) return [];
     const dist = {};
@@ -185,7 +194,7 @@ window.Studio.SimulationEngine = (function () {
   const STANDUP_TOPICS = [
     "Sprint 2.3: Daily Routine & Dialogue Sync",
     "Child UX & Sound Cues Playtest Review",
-    "Isometric Atrium Performance & QA Sign-Off"
+    "Hexagon Studio Layout & QA Sign-Off"
   ];
 
   let agentStates = [];
@@ -195,7 +204,6 @@ window.Studio.SimulationEngine = (function () {
   let lastTimestamp = 0;
   let onTickCallback = null;
 
-  // Studio clock in minutes from midnight (starts at 09:05 AM = 545)
   let studioMinutes = 545;
   let dayCount = 1;
   let dailyStandupTriggered = false;
@@ -204,7 +212,7 @@ window.Studio.SimulationEngine = (function () {
   let meetingState = { active: false, timer: 0, topic: STANDUP_TOPICS[0] };
 
   const LOUNGE_SPOTS = ["lounge_sofa_w", "lounge_sofa_e", "atrium_s", "atrium_n"];
-  const PEER_AISLES = ["aisle_dev", "aisle_cre_w", "aisle_cre_e", "corridor_nw"];
+  const PEER_AISLES = ["aisle_dev", "aisle_cre_w", "aisle_cre_e", "aisle_qa"];
   const MEETING_SPOTS = ["meeting_seat1", "meeting_seat2", "meeting_seat3", "meeting_seat4"];
 
   function speak(st, text, duration = 4.2) {
@@ -355,7 +363,6 @@ window.Studio.SimulationEngine = (function () {
     return available[Math.floor(Math.random() * available.length)];
   }
 
-  // Check if another moving agent is already directly ahead on the same edge/doorway
   function isWayBlockedAhead(st, targetPt) {
     const dx = targetPt.x - st.x;
     const dy = targetPt.y - st.y;
@@ -374,7 +381,6 @@ window.Studio.SimulationEngine = (function () {
       const d = Math.hypot(ox, oy);
       if (d > 0 && d < 26) {
         const dot = (ox * dirX + oy * dirY) / d;
-        // Yield smoothly along the exact corridor path without pushing off-graph
         if (dot > 0.72) return true;
       }
     }
@@ -382,8 +388,7 @@ window.Studio.SimulationEngine = (function () {
   }
 
   function stepSimulation(dt) {
-    const isOvernight = studioMinutes >= 1110 || studioMinutes < 525; // 6:30 PM - 8:45 AM
-    // Fast-forward overnight hours smoothly so the day/night cycle reads naturally
+    const isOvernight = studioMinutes >= 1110 || studioMinutes < 525;
     studioMinutes += dt * (isOvernight ? 18.0 : 2.0);
 
     if (studioMinutes >= 1440) {
@@ -394,7 +399,6 @@ window.Studio.SimulationEngine = (function () {
       morningArrivalTriggered = false;
     }
 
-    // 08:45 AM (525 mins): Morning arrival greeting & return to workstations
     if (!morningArrivalTriggered && studioMinutes >= 525 && studioMinutes < 545) {
       morningArrivalTriggered = true;
       agentStates.forEach((st, idx) => {
@@ -407,13 +411,11 @@ window.Studio.SimulationEngine = (function () {
       });
     }
 
-    // 02:30 PM (870 mins): Scheduled Daily Stand-Up
     if (!dailyStandupTriggered && studioMinutes >= 870 && studioMinutes < 885) {
       dailyStandupTriggered = true;
       callTeamStandup();
     }
 
-    // 05:45 PM (1065 mins): Evening wrap-up — everyone wraps tasks & returns to desks / lounge
     if (!eveningWrapTriggered && studioMinutes >= 1065 && studioMinutes < 1090) {
       eveningWrapTriggered = true;
       meetingState.active = false;
@@ -459,7 +461,6 @@ window.Studio.SimulationEngine = (function () {
         const nextNodeId = st.waypoints[0];
         const targetPt = NAV_NODES[nextNodeId];
 
-        // Queue cleanly behind any agent directly ahead in a doorway/corridor
         if (isWayBlockedAhead(st, targetPt)) {
           return;
         }
@@ -483,7 +484,6 @@ window.Studio.SimulationEngine = (function () {
           st.y += (dy / dist) * walkSpeed * dt;
         }
       } else {
-        // Overnight rest period: keep agents stationary at desks until 08:45 AM
         if (isOvernight) {
           st.state = "IDLE";
           st.currentActivity = "Studio closed overnight (Resumes 08:45 AM)";
