@@ -37,6 +37,14 @@
   let dragStartY = 0;
   let selectedAgentId = null;
 
+  // Cached inspector telemetry elements & HUD throttle state
+  let inspectorCache = { agentId: null, badgeEl: null, actEl: null, locEl: null, nextEl: null };
+  let lastHudUpdateMs = 0;
+  let lastClockText = "";
+  let lastPhaseText = "";
+  let lastEveningState = null;
+  let lastMeetingState = null;
+
   function applyCameraTransform() {
     const widthRatio = (window.innerWidth - 32) / 1180;
     const heightRatio = (window.innerHeight - 96) / 730;
@@ -59,15 +67,30 @@
   window.addEventListener("resize", applyCameraTransform);
 
   SimulationEngine.init(AGENTS, (states, clock) => {
+    const now = performance.now();
+    if (now - lastHudUpdateMs < 200) return; // Throttle DOM HUD writes to ~5 Hz
+    lastHudUpdateMs = now;
+
     if (clock) {
-      if (studioTimeReadout) studioTimeReadout.textContent = clock.timeStr;
-      if (studioPhaseReadout) studioPhaseReadout.textContent = clock.phase;
-      isoViewport.classList.toggle("evening-mood", clock.isEvening);
-      if (btnCallMeeting) {
+      if (studioTimeReadout && clock.timeStr !== lastClockText) {
+        lastClockText = clock.timeStr;
+        studioTimeReadout.textContent = clock.timeStr;
+      }
+      if (studioPhaseReadout && clock.phase !== lastPhaseText) {
+        lastPhaseText = clock.phase;
+        studioPhaseReadout.textContent = clock.phase;
+      }
+      if (clock.isEvening !== lastEveningState) {
+        lastEveningState = clock.isEvening;
+        isoViewport.classList.toggle("evening-mood", clock.isEvening);
+      }
+      if (btnCallMeeting && clock.meetingActive !== lastMeetingState) {
+        lastMeetingState = clock.meetingActive;
         btnCallMeeting.classList.toggle("active", clock.meetingActive);
         btnCallMeeting.textContent = clock.meetingActive ? "Stand-Up Active" : "Call Stand-Up";
       }
     }
+
     if (selectedAgentId && inspectorDrawer.classList.contains("open")) {
       updateLiveInspectorTelemetry(selectedAgentId);
     }
@@ -197,6 +220,7 @@
 
   function clearAgentHighlight() {
     selectedAgentId = null;
+    inspectorCache.agentId = null;
     document.querySelectorAll(".interactive-agent").forEach((el) => el.classList.remove("highlighted"));
   }
 
@@ -204,11 +228,17 @@
     const st = SimulationEngine.getAgentState(agentId);
     if (!st) return;
 
-    const badgeEl = document.getElementById("live-state-badge");
-    const actEl = document.getElementById("live-activity-text");
-    const locEl = document.getElementById("live-location-text");
-    const nextEl = document.getElementById("live-next-text");
+    if (inspectorCache.agentId !== agentId) {
+      inspectorCache = {
+        agentId,
+        badgeEl: document.getElementById("live-state-badge"),
+        actEl: document.getElementById("live-activity-text"),
+        locEl: document.getElementById("live-location-text"),
+        nextEl: document.getElementById("live-next-text")
+      };
+    }
 
+    const { badgeEl, actEl, locEl, nextEl } = inspectorCache;
     if (badgeEl) {
       badgeEl.className = `state-badge state-${st.state}`;
       badgeEl.textContent = st.state.replace(/_/g, " ");
@@ -295,9 +325,12 @@
       </div>
 
       <div class="phase-notice">
-        <strong>Simulated Activity (Phase 2.3 &amp; 2.4):</strong> Daily routines, peer dialogue bubbles, and coordinated stand-up meetings run locally in the browser.
+        <strong>Simulated Activity (Phase 2.3 &amp; 2.4):</strong> Weighted Dijkstra pathfinding, doorway queuing, and full day/evening schedules run locally in the browser.
       </div>
     `;
+
+    inspectorCache.agentId = null;
+    updateLiveInspectorTelemetry(agent.id);
 
     document.getElementById("btn-agent-lounge").onclick = () => SimulationEngine.sendAgentToLounge(agent.id);
     document.getElementById("btn-agent-standup").onclick = () => SimulationEngine.callTeamStandup();
@@ -323,7 +356,7 @@
             ? `<ul class="inspector-list">${zoneAgents
                 .map((a) => `<li><strong>${a.name}</strong> — ${a.title}</li>`)
                 .join("")}</ul>`
-            : `<p>Shared communal destination accessible via the BFS navigation graph.</p>`
+            : `<p>Shared communal destination accessible via the weighted Dijkstra navigation graph.</p>`
         }
       </div>
 
