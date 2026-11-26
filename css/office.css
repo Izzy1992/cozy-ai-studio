@@ -37,17 +37,21 @@
   width: 100%;
   height: 100%;
   display: block;
-  filter: drop-shadow(0 24px 36px rgba(51, 38, 29, 0.2));
 }
 
 /* Interactive SVG Entities */
 .interactive-agent {
   cursor: pointer;
-  transition: filter 0.2s ease;
 }
 
-.interactive-agent:hover {
-  filter: drop-shadow(0 6px 12px rgba(217, 119, 6, 0.65));
+.interactive-agent .agent-state-sub {
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.interactive-agent:hover .agent-state-sub,
+.interactive-agent.highlighted .agent-state-sub {
+  opacity: 1;
 }
 
 .interactive-agent.highlighted .selection-ring {
