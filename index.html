@@ -4,12 +4,354 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sunbeam Indie Studio — Corporate Virtual Office &amp; Sprint Kanban</title>
-  <link rel="stylesheet" href="css/style.css?v=3.2" />
-  <link rel="stylesheet" href="css/office.css?v=3.2" />
+  <link rel="stylesheet" href="css/office.css?v=3.3" />
+  <style>
+    :root {
+      --bg-cream: #f4f1ea;
+      --bg-warm-panel: #fcfbf8;
+      --bg-sand: #eae5dc;
+      --border-wood: #d5cec2;
+      --text-espresso: #1e293b;
+      --text-muted: #64748b;
+      --accent-sage: #3f694c;
+      --accent-sage-soft: #e6f0e9;
+      --shadow-cozy: 0 12px 30px rgba(15, 23, 42, 0.10);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-cream);
+      color: var(--text-espresso);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    #app-shell {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    .studio-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 18px;
+      background: var(--bg-warm-panel);
+      border-bottom: 1.5px solid var(--border-wood);
+      z-index: 30;
+      flex-wrap: wrap;
+    }
+
+    .brand-cluster { display: flex; align-items: center; gap: 10px; }
+
+    .brand-emblem {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: #f1ede4;
+      border: 1.5px solid var(--border-wood);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .studio-title { font-size: 15px; font-weight: 800; color: var(--text-espresso); line-height: 1.15; }
+    .studio-subtitle { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+    .studio-nav {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-sand);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-wood);
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .nav-btn:hover { color: var(--text-espresso); background: rgba(255, 255, 255, 0.65); }
+    .nav-btn.active { background: var(--bg-warm-panel); color: var(--text-espresso); box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08); }
+
+    .studio-clock-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #f4f1ea;
+      border: 1px solid var(--border-wood);
+      border-radius: 9px;
+      padding: 4px 10px;
+    }
+
+    .clock-time { font-size: 12px; font-weight: 800; color: var(--text-espresso); }
+    .clock-phase { font-size: 11px; font-weight: 700; color: var(--text-muted); border-left: 1px solid var(--border-wood); padding-left: 7px; }
+
+    .viewport-controls { display: flex; align-items: center; gap: 6px; }
+
+    .sim-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-sand);
+      padding: 3px 6px;
+      border-radius: 9px;
+      border: 1px solid var(--border-wood);
+      margin-right: 4px;
+    }
+
+    .sim-btn {
+      background: var(--bg-warm-panel);
+      border: 1px solid var(--border-wood);
+      color: var(--text-espresso);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sim-btn:hover { background: #f1ede4; }
+    .sim-btn.primary { background: var(--accent-sage); color: #ffffff; border-color: #2f523a; }
+    .sim-btn.primary.paused { background: #475569; border-color: #334155; }
+    .sim-btn.meeting-trigger { background: #e2ece9; color: #115e59; border-color: #99f6e4; }
+    .sim-btn.meeting-trigger.active { background: #0f766e; color: #ffffff; border-color: #115e59; }
+
+    .sim-select, .icon-btn {
+      background: var(--bg-warm-panel);
+      border: 1px solid var(--border-wood);
+      color: var(--text-espresso);
+      border-radius: 7px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .zoom-label { font-size: 12px; font-weight: 700; min-width: 40px; text-align: center; color: var(--text-muted); }
+
+    .studio-workspace { position: relative; flex: 1; width: 100%; overflow: hidden; }
+    .view-section { display: none; width: 100%; height: 100%; }
+    .view-section.active { display: flex; }
+
+    .panel-scroll { flex-direction: column; overflow-y: auto; padding: 24px 28px; gap: 20px; }
+    .section-header h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .section-header p { font-size: 14px; color: var(--text-muted); }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 16px;
+    }
+
+    .studio-card {
+      background: var(--bg-warm-panel);
+      border: 1px solid var(--border-wood);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-top { display: flex; align-items: center; gap: 12px; }
+
+    .avatar-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--border-wood);
+      flex-shrink: 0;
+    }
+
+    .card-title { font-size: 16px; font-weight: 800; }
+    .card-role { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .skill-tag {
+      background: var(--bg-sand);
+      color: var(--text-espresso);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+
+    .card-actions { margin-top: auto; padding-top: 8px; display: flex; justify-content: flex-end; }
+
+    .primary-pill-btn {
+      background: #334155;
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 7px 15px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .roadmap-list { display: flex; flex-direction: column; gap: 14px; max-width: 880px; }
+
+    .roadmap-item {
+      background: var(--bg-warm-panel);
+      border: 1px solid var(--border-wood);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-pill { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .status-active { background: var(--accent-sage-soft); color: var(--accent-sage); border: 1px solid #9ec9ac; }
+    .status-upcoming { background: var(--bg-sand); color: var(--text-muted); }
+
+    .state-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .state-WORKING { background: #e0f2fe; color: #0369a1; }
+    .state-THINKING { background: #fef3c7; color: #92400e; }
+    .state-IDLE { background: #f1f5f9; color: #475569; }
+    .state-WALKING, .state-RETURNING_TO_DESK, .state-PEER_REVIEW { background: #dcfce7; color: #166534; }
+    .state-USING_LOUNGE, .state-TAKING_BREAK { background: #f3e8ff; color: #6b21a8; }
+    .state-IN_MEETING { background: #ccfbf1; color: #115e59; }
+
+    /* Kanban Board */
+    .kanban-header-bar { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+
+    .kanban-add-form {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: var(--bg-warm-panel);
+      border: 1px solid var(--border-wood);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+    }
+
+    .kanban-add-form input {
+      flex: 1;
+      min-width: 220px;
+      border: 1px solid var(--border-wood);
+      border-radius: 7px;
+      padding: 7px 11px;
+      font-size: 13px;
+      background: #ffffff;
+    }
+
+    .kanban-add-form select {
+      border: 1px solid var(--border-wood);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      background: #ffffff;
+    }
+
+    .kanban-board-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(240px, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) { .kanban-board-grid { grid-template-columns: repeat(2, minmax(220px, 1fr)); } }
+    @media (max-width: 600px) { .kanban-board-grid { grid-template-columns: 1fr; } }
+
+    .kanban-col {
+      background: #f1ede4;
+      border: 1px solid var(--border-wood);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 360px;
+    }
+
+    .kanban-col-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-wood);
+      font-size: 12.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .kanban-count {
+      background: var(--bg-warm-panel);
+      border: 1px solid var(--border-wood);
+      border-radius: 999px;
+      padding: 1px 8px;
+      font-size: 11px;
+    }
+
+    .kanban-card {
+      background: var(--bg-warm-panel);
+      border: 1px solid var(--border-wood);
+      border-radius: 10px;
+      padding: 11px 12px;
+      box-shadow: 0 3px 8px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .kanban-card-title { font-size: 13px; font-weight: 700; line-height: 1.35; }
+    .kanban-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); }
+
+    .prio-badge { padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+    .prio-High { background: #fee2e2; color: #991b1b; }
+    .prio-Medium { background: #fef3c7; color: #92400e; }
+    .prio-Low { background: #e0f2fe; color: #075985; }
+
+    .kanban-progress-track { width: 100%; height: 6px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .kanban-progress-fill { height: 100%; background: #0284c7; transition: width 0.25s ease; }
+
+    .kanban-card-actions { display: flex; justify-content: space-between; gap: 4px; margin-top: 2px; }
+    .k-mini-btn { background: var(--bg-sand); border: 1px solid var(--border-wood); border-radius: 6px; padding: 3px 7px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .k-mini-btn:hover { background: #e2dcd0; }
+
+    @media (max-width: 960px) {
+      .studio-topbar { padding: 8px 12px; }
+      .studio-subtitle, .canvas-hint, .clock-phase { display: none; }
+      .nav-btn { padding: 5px 9px; font-size: 12px; }
+    }
+  </style>
 </head>
 <body>
   <div id="app-shell">
-    <!-- Top Compact Studio Bar -->
     <header class="studio-topbar">
       <div class="brand-cluster">
         <div class="brand-emblem" aria-hidden="true">
@@ -25,7 +367,6 @@
         </div>
       </div>
 
-      <!-- Primary Navigation -->
       <nav class="studio-nav" aria-label="Studio Navigation">
         <button class="nav-btn active" data-view="office">Isometric Office</button>
         <button class="nav-btn" data-view="kanban">Sprint Board</button>
@@ -34,7 +375,6 @@
         <button class="nav-btn" data-view="roadmap">Phase Roadmap</button>
       </nav>
 
-      <!-- Simulation & Camera Controls -->
       <div class="viewport-controls">
         <div class="studio-clock-pill" title="Simulated Studio Schedule">
           <span id="studio-time-readout" class="clock-time">Day 1 &middot; 09:05 AM</span>
@@ -42,32 +382,29 @@
         </div>
 
         <div class="sim-controls" role="group" aria-label="Simulation Controls">
-          <button class="sim-btn primary" id="btn-sim-toggle" title="Pause or Resume Employee Simulation">Pause</button>
+          <button class="sim-btn primary" id="btn-sim-toggle">Pause</button>
           <select id="sim-speed-select" class="sim-select" title="Simulation Speed">
             <option value="0.5">0.5x</option>
             <option value="1" selected>1x</option>
             <option value="2">2x</option>
             <option value="3">3x</option>
           </select>
-          <button class="sim-btn meeting-trigger" id="btn-call-meeting" title="Gather Team in Meeting Room">Call Stand-Up</button>
-          <button class="sim-btn" id="btn-sim-reset" title="Return All Employees to Desks">Reset</button>
+          <button class="sim-btn meeting-trigger" id="btn-call-meeting">Call Stand-Up</button>
+          <button class="sim-btn" id="btn-sim-reset">Reset</button>
         </div>
 
-        <button class="icon-btn" id="btn-zoom-out" title="Zoom Out">&minus;</button>
+        <button class="icon-btn" id="btn-zoom-out">&minus;</button>
         <span id="zoom-readout" class="zoom-label">100%</span>
-        <button class="icon-btn" id="btn-zoom-in" title="Zoom In">+</button>
-        <button class="icon-btn" id="btn-reset-view" title="Center Office">Center</button>
+        <button class="icon-btn" id="btn-zoom-in">+</button>
+        <button class="icon-btn" id="btn-reset-view">Center</button>
       </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="studio-workspace">
-      <!-- VIEW 1: ISOMETRIC OFFICE -->
       <section id="view-office" class="view-section active">
         <div id="iso-viewport" class="iso-viewport">
           <div id="iso-stage" class="iso-stage"></div>
 
-          <!-- Floating Zone Quick-Jump Pill Bar -->
           <div class="zone-jumper">
             <span class="jumper-label">Focus Zone:</span>
             <button class="zone-pill active" data-zone="all">Full Studio</button>
@@ -79,14 +416,12 @@
             <button class="zone-pill" data-zone="qa">QA Testing</button>
           </div>
 
-          <!-- Floating Helper Tip -->
           <div class="canvas-hint">
             <span id="sim-status-dot" class="status-dot running"></span>
             <span id="sim-status-text">Simulation Running (1x)</span> &bull; Click any employee to inspect live tasks &amp; progress
           </div>
         </div>
 
-        <!-- Slide-Out Inspection Drawer -->
         <aside id="inspector-drawer" class="inspector-drawer" aria-live="polite">
           <div class="drawer-header">
             <span id="drawer-kicker" class="drawer-kicker">STUDIO INSPECTOR</span>
@@ -96,12 +431,11 @@
         </aside>
       </section>
 
-      <!-- VIEW 2: PHASE 3 KANBAN SPRINT BOARD -->
       <section id="view-kanban" class="view-section panel-scroll">
         <div class="kanban-header-bar">
           <div class="section-header">
             <h2>Sprint Kanban Board (Live Agent Task Engine)</h2>
-            <p>Assign tasks to employees—their overhead progress bars update live as they work and pass items to Sofea for QA review.</p>
+            <p>Assign tasks to employees—their progress bars update live as they work and pass items to Sofea for QA review.</p>
           </div>
           <button id="btn-reset-kanban" class="sim-btn">Reset Default Tasks</button>
         </div>
@@ -120,7 +454,6 @@
         <div id="kanban-board-grid" class="kanban-board-grid"></div>
       </section>
 
-      <!-- VIEW 3: TEAM ROSTER -->
       <section id="view-team" class="view-section panel-scroll">
         <div class="section-header">
           <h2>AI Studio Employees (7 Agents)</h2>
@@ -129,7 +462,6 @@
         <div id="team-grid" class="cards-grid"></div>
       </section>
 
-      <!-- VIEW 4: OFFICE ZONES -->
       <section id="view-zones" class="view-section panel-scroll">
         <div class="section-header">
           <h2>Corporate Headquarters Floorplan &amp; Zones</h2>
@@ -138,7 +470,6 @@
         <div id="zones-grid" class="cards-grid"></div>
       </section>
 
-      <!-- VIEW 5: PHASE ROADMAP -->
       <section id="view-roadmap" class="view-section panel-scroll">
         <div class="section-header">
           <h2>Development Phases &amp; Architecture Transparency</h2>
@@ -149,10 +480,10 @@
     </main>
   </div>
 
-  <script src="js/agents.js?v=3.2"></script>
-  <script src="js/kanban.js?v=3.2"></script>
-  <script src="js/office.js?v=3.2"></script>
-  <script src="js/simulation.js?v=3.2"></script>
-  <script src="js/app.js?v=3.2"></script>
+  <script src="js/agents.js?v=3.3"></script>
+  <script src="js/kanban.js?v=3.3"></script>
+  <script src="js/office.js?v=3.3"></script>
+  <script src="js/simulation.js?v=3.3"></script>
+  <script src="js/app.js?v=3.3"></script>
 </body>
 </html>
