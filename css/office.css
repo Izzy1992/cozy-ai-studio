@@ -8,6 +8,11 @@
   overflow: hidden;
   cursor: grab;
   user-select: none;
+  transition: background 0.8s ease;
+}
+
+.iso-viewport.evening-mood {
+  background: radial-gradient(circle at 50% 45%, #f3dec8 0%, #cfb396 100%);
 }
 
 .iso-viewport:active {
@@ -67,6 +72,12 @@
 
 .zone-hotspot:hover {
   opacity: 0.94;
+}
+
+/* Speech Bubbles */
+.agent-speech-bubble {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none;
 }
 
 /* State-Driven Character Animations */
@@ -312,6 +323,29 @@
   justify-content: space-between;
   align-items: center;
   font-size: 12.5px;
+}
+
+.quick-action-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.drawer-action-btn {
+  flex: 1;
+  background: var(--bg-warm-panel);
+  border: 1.5px solid var(--border-wood);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-espresso);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.drawer-action-btn:hover {
+  background: var(--bg-sand);
 }
 
 .phase-notice {
