@@ -1,3 +1,419 @@
+:root {
+  --bg-cream: #f4f1ea;
+  --bg-warm-panel: #fcfbf8;
+  --bg-sand: #eae5dc;
+  --border-wood: #d5cec2;
+  --text-espresso: #1e293b;
+  --text-muted: #64748b;
+  --accent-amber: #b45309;
+  --accent-amber-soft: #fef3c7;
+  --accent-sage: #3f694c;
+  --accent-sage-soft: #e6f0e9;
+  --accent-terracotta: #9a3412;
+  --shadow-cozy: 0 12px 30px rgba(15, 23, 42, 0.10);
+  --radius-lg: 14px;
+  --radius-md: 10px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-cream);
+  color: var(--text-espresso);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+#app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* Top Bar */
+.studio-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 18px;
+  background: var(--bg-warm-panel);
+  border-bottom: 1.5px solid var(--border-wood);
+  z-index: 30;
+  flex-wrap: wrap;
+}
+
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-emblem {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #f1ede4;
+  border: 1.5px solid var(--border-wood);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studio-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-espresso);
+  line-height: 1.15;
+}
+
+.studio-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Navigation */
+.studio-nav {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-sand);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--border-wood);
+}
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.nav-btn:hover {
+  color: var(--text-espresso);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.nav-btn.active {
+  background: var(--bg-warm-panel);
+  color: var(--text-espresso);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+/* Studio Day Clock Pill */
+.studio-clock-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #f4f1ea;
+  border: 1px solid var(--border-wood);
+  border-radius: 9px;
+  padding: 4px 10px;
+}
+
+.clock-time {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-espresso);
+}
+
+.clock-phase {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-left: 1px solid var(--border-wood);
+  padding-left: 7px;
+}
+
+/* Simulation & Viewport Controls */
+.viewport-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sim-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-sand);
+  padding: 3px 6px;
+  border-radius: 9px;
+  border: 1px solid var(--border-wood);
+  margin-right: 4px;
+}
+
+.sim-btn {
+  background: var(--bg-warm-panel);
+  border: 1px solid var(--border-wood);
+  color: var(--text-espresso);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.sim-btn:hover {
+  background: #f1ede4;
+}
+
+.sim-btn.primary {
+  background: var(--accent-sage);
+  color: #ffffff;
+  border-color: #2f523a;
+}
+
+.sim-btn.primary.paused {
+  background: #475569;
+  border-color: #334155;
+}
+
+.sim-btn.meeting-trigger {
+  background: #e2ece9;
+  color: #115e59;
+  border-color: #99f6e4;
+}
+
+.sim-btn.meeting-trigger.active {
+  background: #0f766e;
+  color: #ffffff;
+  border-color: #115e59;
+}
+
+.sim-select {
+  background: var(--bg-warm-panel);
+  border: 1px solid var(--border-wood);
+  color: var(--text-espresso);
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.icon-btn {
+  background: var(--bg-warm-panel);
+  border: 1px solid var(--border-wood);
+  color: var(--text-espresso);
+  border-radius: 7px;
+  padding: 4px 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: var(--bg-sand);
+}
+
+.zoom-label {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* Workspace & Views */
+.studio-workspace {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+.view-section {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.view-section.active {
+  display: flex;
+}
+
+.panel-scroll {
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 24px 28px;
+  gap: 20px;
+}
+
+.section-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.section-header p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Cards Grid for Team & Zones */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 16px;
+}
+
+.studio-card {
+  background: var(--bg-warm-panel);
+  border: 1px solid var(--border-wood);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.studio-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-cozy);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-wood);
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.card-role {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  background: var(--bg-sand);
+  color: var(--text-espresso);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.card-actions {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.primary-pill-btn {
+  background: #334155;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 7px 15px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.primary-pill-btn:hover {
+  background: #1e293b;
+}
+
+/* Roadmap List */
+.roadmap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 880px;
+}
+
+.roadmap-item {
+  background: var(--bg-warm-panel);
+  border: 1px solid var(--border-wood);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status-active {
+  background: var(--accent-sage-soft);
+  color: var(--accent-sage);
+  border: 1px solid #9ec9ac;
+}
+
+.status-upcoming {
+  background: var(--bg-sand);
+  color: var(--text-muted);
+}
+
+/* Live State Badges in Inspector */
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.state-WORKING { background: #e0f2fe; color: #0369a1; }
+.state-THINKING { background: #fef3c7; color: #92400e; }
+.state-IDLE { background: #f1f5f9; color: #475569; }
+.state-WALKING, .state-RETURNING_TO_DESK, .state-PEER_REVIEW { background: #dcfce7; color: #166534; }
+.state-USING_LOUNGE, .state-TAKING_BREAK { background: #f3e8ff; color: #6b21a8; }
+.state-IN_MEETING { background: #ccfbf1; color: #115e59; }
+
 /* Phase 3: Kanban Sprint Board */
 .kanban-header-bar {
   display: flex;
@@ -157,4 +573,17 @@
 
 .k-mini-btn:hover {
   background: #e2dcd0;
+}
+
+@media (max-width: 960px) {
+  .studio-topbar {
+    padding: 8px 12px;
+  }
+  .studio-subtitle, .canvas-hint, .clock-phase {
+    display: none;
+  }
+  .nav-btn {
+    padding: 5px 9px;
+    font-size: 12px;
+  }
 }
